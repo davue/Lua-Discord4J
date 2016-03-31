@@ -4,6 +4,7 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import de.luad4j.luafunc.*;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
@@ -11,8 +12,8 @@ import sx.blah.discord.util.DiscordException;
 
 public class Main 
 {
-	private static IDiscordClient mDiscordClient;
-	private static Globals mLuaEnv = JsePlatform.standardGlobals();
+	public static IDiscordClient mDiscordClient;
+	public static Globals mLuaEnv = JsePlatform.standardGlobals();
 	
 	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
 	public static void main(String[] args) 
@@ -32,6 +33,8 @@ public class Main
 		EventDispatcher dispatcher = mDiscordClient.getDispatcher();
 		dispatcher.registerListener(new EventHandler(mLuaEnv));
 		
+		registerLuaFunctions(); // register lua functions
+		
 		try
 		{
 			mLuaEnv.get("dofile").call("test.lua"); // execute lua main file
@@ -41,5 +44,10 @@ public class Main
 			System.err.println("Error occured while loading lua mine file!");
 			err.printStackTrace();
 		}
+	}
+	
+	private static void registerLuaFunctions()
+	{
+		mLuaEnv.set("sendMessage", new sendMessage(mDiscordClient));
 	}
 }

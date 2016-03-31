@@ -26,12 +26,20 @@ I will try to implement every event Discord4J has but now only these events are 
 
 * `onReady()`
 
-   Called when Discord4J is ready to interact with the API   
-   
+   Called when Discord4J is ready to interact with the API.
+
 * `onDisconnected(string: reason)`
 
-   Called if Discord4J lost connection to the API
+   Called if Discord4J lost connection to the API.
 
 * `onMessageReceived(table: message)`
 
-   Called if a new message was received
+   Called if a new message was received.
+
+### Functions
+Here are the functions you can use inside Lua to interact with the Discord API:
+
+* `sendMessage(string: channelid, string: message)`
+
+   Sends a message to the given channel.   
+   Returns: true on success **or** false and error message   
