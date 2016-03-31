@@ -25,7 +25,8 @@ public class EventHandler
 	@EventSubscriber
 	public void onMessageReceived(MessageReceivedEvent event)
 	{
-		try {
+		try 
+		{
 			LuaValue author = LuaValue.tableOf();
 			author.set("id", event.getMessage().getAuthor().getID());
 			author.set("name", event.getMessage().getAuthor().getName());
@@ -41,7 +42,9 @@ public class EventHandler
 			//message.set("guild", event.getMessage().getGuild().getName()); // <- this breaks execution of this function
 			
 			Main.mLuaEnv.get("onMessageReceived").call(message);
-		} catch(LuaError e) {
+		} 
+		catch(LuaError e) 
+		{
 			e.printStackTrace();
 		}	
 	}

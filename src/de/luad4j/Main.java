@@ -23,7 +23,7 @@ public class Main
 		builder.withLogin(args[0], args[1]);
 		try 
 		{
-			mDiscordClient = builder.login(); //Builds the IDiscordClient instance and logs it in
+			mDiscordClient = builder.login(); // Builds the IDiscordClient instance and logs it in
 		} 
 		catch (DiscordException e) 
 		{
@@ -31,11 +31,11 @@ public class Main
 			e.printStackTrace();
 		}
 		
-		// Load Lua
+		// load Lua
 		try
 		{
-			registerLuaFunctions(); // register lua functions
-			mLuaEnv.get("dofile").call(args[2]); // execute lua main file
+			registerLuaFunctions(); // Register lua functions
+			mLuaEnv.get("dofile").call(args[2]); // Execute lua main file
 		} 
 		catch (LuaError err)
 		{

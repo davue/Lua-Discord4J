@@ -24,18 +24,25 @@ public class sendMessage extends VarArgFunction
 	{	
 		Varargs returnval;
 		
-		try {
+		try 
+		{
 			new MessageBuilder(mClient).withChannel(v.tojstring(1)).withContent(v.tojstring(2)).build();
 			returnval = LuaValue.varargsOf(new LuaValue[] {LuaValue.valueOf(true), NIL});
-		} catch (HTTP429Exception e){
+		} 
+		catch (HTTP429Exception e)
+		{
 			System.err.println("Sending messages too quickly");
 			e.printStackTrace();
 			returnval = LuaValue.varargsOf(new LuaValue[] {LuaValue.valueOf(false), LuaValue.valueOf("Sending messages too quickly!")});
-		} catch (DiscordException e) {
+		} 
+		catch (DiscordException e) 
+		{
 			System.err.println(e.getErrorMessage());
 			e.printStackTrace();
 			returnval = LuaValue.varargsOf(new LuaValue[] {LuaValue.valueOf(false), LuaValue.valueOf(e.getErrorMessage())});
-		} catch (MissingPermissionsException e) {
+		} 
+		catch (MissingPermissionsException e) 
+		{
 			System.err.println("Missing permissions for channel!");
 			e.printStackTrace();
 			returnval = LuaValue.varargsOf(new LuaValue[] {LuaValue.valueOf(false), LuaValue.valueOf("Missing permissions for channel!")});
