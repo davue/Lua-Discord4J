@@ -21,11 +21,11 @@ public class sendMessage extends VarArgFunction
 	
 	@Override
 	public Varargs invoke(Varargs v) 
-	{
+	{	
 		Varargs returnval;
 		
 		try {
-			new MessageBuilder(mClient).withChannel(v.tojstring(0)).withContent(v.tojstring(1)).build();
+			new MessageBuilder(mClient).withChannel(v.tojstring(1)).withContent(v.tojstring(2)).build();
 			returnval = LuaValue.varargsOf(new LuaValue[] {LuaValue.valueOf(true), NIL});
 		} catch (HTTP429Exception e){
 			System.err.println("Sending messages too quickly");

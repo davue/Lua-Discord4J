@@ -18,6 +18,7 @@ public class Main
 	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
 	public static void main(String[] args) 
 	{
+		// Login into Discord
 		ClientBuilder builder = new ClientBuilder();
 		builder.withLogin("discord.stammbot@gmail.com", "stammgruppe123");
 		try 
@@ -30,13 +31,10 @@ public class Main
 			e.printStackTrace();
 		}
 		
-		EventDispatcher dispatcher = mDiscordClient.getDispatcher();
-		dispatcher.registerListener(new EventHandler(mLuaEnv));
-		
-		registerLuaFunctions(); // register lua functions
-		
+		// Load Lua
 		try
 		{
+			registerLuaFunctions(); // register lua functions
 			mLuaEnv.get("dofile").call("test.lua"); // execute lua main file
 		} 
 		catch (LuaError err)
@@ -44,6 +42,10 @@ public class Main
 			System.err.println("Error occured while loading lua mine file!");
 			err.printStackTrace();
 		}
+		
+		// Start event listener
+		EventDispatcher dispatcher = mDiscordClient.getDispatcher();
+		dispatcher.registerListener(new EventHandler());
 	}
 	
 	private static void registerLuaFunctions()
