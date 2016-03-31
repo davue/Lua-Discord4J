@@ -20,7 +20,7 @@ public class Main
 	{
 		// Login into Discord
 		ClientBuilder builder = new ClientBuilder();
-		builder.withLogin("discord.stammbot@gmail.com", "stammgruppe123");
+		builder.withLogin(args[0], args[1]);
 		try 
 		{
 			mDiscordClient = builder.login(); //Builds the IDiscordClient instance and logs it in
@@ -35,7 +35,7 @@ public class Main
 		try
 		{
 			registerLuaFunctions(); // register lua functions
-			mLuaEnv.get("dofile").call("test.lua"); // execute lua main file
+			mLuaEnv.get("dofile").call(args[2]); // execute lua main file
 		} 
 		catch (LuaError err)
 		{
