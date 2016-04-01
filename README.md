@@ -22,7 +22,7 @@ Later, I will switch to or at least add an **botuser token authentication** inst
 
 ### Events
 Because Discord4J is very event driven and because it's nicer for bots, this wrapper also mainly works with events.
-I will try to implement every event Discord4J has but now only these events are called:
+I will try to implement every event Discord4J has but now, only these events are called:
 
 * `onReady()`
 
