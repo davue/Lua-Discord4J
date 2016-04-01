@@ -70,31 +70,120 @@ public class EventHandler
 	@EventSubscriber
 	public void onMessageSend(MessageSendEvent event)
 	{
-		
+		// not needed
 	}
 	
 	@EventSubscriber
-	public void onMessageDelete(MessageDeleteEvent event)
+	public void onMessageDeleted(MessageDeleteEvent event)
 	{
-		
+		try
+		{
+			LuaValue author = LuaValue.tableOf();
+			author.set("id", event.getMessage().getAuthor().getID());
+			author.set("name", event.getMessage().getAuthor().getName());
+			
+			LuaValue channel = LuaValue.tableOf();
+			channel.set("id", event.getMessage().getChannel().getID());
+			channel.set("name", event.getMessage().getChannel().getName());
+			
+			LuaValue message = LuaValue.tableOf();
+			message.set("author", author);
+			message.set("channel", channel);
+			message.set("text", event.getMessage().getContent());
+			
+			Main.mLuaEnv.get("onMessageDeleted").call(message);
+		} 
+		catch(LuaError e) 
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	@EventSubscriber
-	public void onMessageUpdate(MessageUpdateEvent event)
+	public void onMessageUpdated(MessageUpdateEvent event)
 	{
-		
+		try
+		{
+			LuaValue author = LuaValue.tableOf();
+			author.set("id", event.getNewMessage().getAuthor().getID());
+			author.set("name", event.getNewMessage().getAuthor().getName());
+			
+			LuaValue channel = LuaValue.tableOf();
+			channel.set("id", event.getNewMessage().getChannel().getID());
+			channel.set("name", event.getNewMessage().getChannel().getName());
+			
+			LuaValue message = LuaValue.tableOf();
+			message.set("author", author);
+			message.set("channel", channel);
+			message.set("oldtext", event.getOldMessage().getContent());
+			message.set("newtext", event.getNewMessage().getContent());
+			
+			Main.mLuaEnv.get("onMessageUpdated").call(message);
+		} 
+		catch(LuaError e) 
+		{
+			if(e.getCause().getMessage() == "attempt to call nil")
+			{
+				System.out.println("Event handler not defined in lua file!");
+			}
+			else
+			{
+				System.out.println(e.getCause().getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@EventSubscriber
 	public void onMessageAcknowledged(MessageAcknowledgedEvent event)
 	{
-		
+		try
+		{
+			LuaValue author = LuaValue.tableOf();
+			author.set("id", event.getAcknowledgedMessage().getAuthor().getID());
+			author.set("name", event.getAcknowledgedMessage().getAuthor().getName());
+			
+			LuaValue channel = LuaValue.tableOf();
+			channel.set("id", event.getAcknowledgedMessage().getChannel().getID());
+			channel.set("name", event.getAcknowledgedMessage().getChannel().getName());
+			
+			LuaValue message = LuaValue.tableOf();
+			message.set("author", author);
+			message.set("channel", channel);
+			message.set("text", event.getAcknowledgedMessage().getContent());
+			
+			Main.mLuaEnv.get("onMessageAcknowledged").call(message);
+		} 
+		catch(LuaError e) 
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	@EventSubscriber
 	public void onMention(MentionEvent event)
 	{
-
+		try
+		{
+			LuaValue author = LuaValue.tableOf();
+			author.set("id", event.getMessage().getAuthor().getID());
+			author.set("name", event.getMessage().getAuthor().getName());
+			
+			LuaValue channel = LuaValue.tableOf();
+			channel.set("id", event.getMessage().getChannel().getID());
+			channel.set("name", event.getMessage().getChannel().getName());
+			
+			LuaValue message = LuaValue.tableOf();
+			message.set("author", author);
+			message.set("channel", channel);
+			message.set("text", event.getMessage().getContent());
+			
+			Main.mLuaEnv.get("onMention").call(message);
+		} 
+		catch(LuaError e) 
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	// Audio Events

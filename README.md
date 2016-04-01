@@ -32,9 +32,27 @@ I will try to implement every event Discord4J has but now only these events are 
 
    Called if Discord4J lost connection to the API.
 
+#### Messages
+
 * `onMessageReceived(table: message)`
 
    Called if a new message was received.
+
+* `onMessageDeleted(table: message)`
+
+   Called if a message gets deleted
+
+* `onMessageUpdated(table: message)`
+
+   Called if a message gets updated
+
+* `onMessageAcknowledged(table: message)`
+
+   Called if a message was acknowledged (read)
+
+* `onMention(table: message)`
+
+   Called if you have been mentioned via @username
 
 ### Functions
 Here are the functions you can use inside Lua to interact with the Discord API:
