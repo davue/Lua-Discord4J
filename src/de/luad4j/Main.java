@@ -69,6 +69,8 @@ public class Main
 	
 	private static void registerLuaFunctions()
 	{
-		mLuaEnv.set("sendMessage", new sendMessage());
+		mLuaEnv.set("sendMessage", new SendMessage());
+		mLuaEnv.set("updateMessage", new UpdateMessage());
+		mLuaEnv.set("deleteMessage", new DeleteMessage());
 	}
 }
