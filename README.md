@@ -60,4 +60,14 @@ Here are the functions you can use inside Lua to interact with the Discord API:
 * `sendMessage(string: channelid, string: message)`
 
    Sends a message to the given channel.   
-   Returns: true on success **or** false and error message   
+   Returns: nil on success **or** error message
+
+* `updateMessage(string: channelid, string: messageid, string: newtext)`
+
+   Changes the text of the given message.   
+   Returns: nil on success **or** error message
+
+* `deleteMessage(string: channelid, string: messageid)`
+
+   Deletes the given message.   
+   Returns: nil on success **or** error message
