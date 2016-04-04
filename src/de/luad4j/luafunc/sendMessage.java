@@ -27,7 +27,7 @@ import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
 
-public class sendMessage extends TwoArgFunction
+public class SendMessage extends TwoArgFunction
 {
 	@Override
 	public LuaValue call(LuaValue channelid, LuaValue text) 

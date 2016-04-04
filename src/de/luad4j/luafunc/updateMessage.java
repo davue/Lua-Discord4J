@@ -8,7 +8,7 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MissingPermissionsException;
 
-public class updateMessage extends ThreeArgFunction 
+public class UpdateMessage extends ThreeArgFunction 
 {
 	@Override
 	public LuaValue call(LuaValue channelid, LuaValue messageid, LuaValue newtext) 

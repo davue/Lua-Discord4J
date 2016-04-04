@@ -8,7 +8,7 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MissingPermissionsException;
 
-public class deleteMessage extends TwoArgFunction 
+public class DeleteMessage extends TwoArgFunction 
 {
 	@Override
 	public LuaValue call(LuaValue channelid, LuaValue messageid) 
