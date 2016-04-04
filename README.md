@@ -24,10 +24,6 @@ Later, I will switch to or at least add an **botuser token authentication** inst
 Because Discord4J is very event driven and because it's nicer for bots, this wrapper also mainly works with events.
 I will try to implement every event Discord4J has but now, only these events are called:
 
-* `onReady()`
-
-   Called when Discord4J is ready to interact with the API.
-
 * `onDisconnected(string: reason)`
 
    Called if Discord4J lost connection to the API.

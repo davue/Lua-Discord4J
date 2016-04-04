@@ -31,12 +31,15 @@ import sx.blah.discord.util.DiscordException;
 
 public class Main 
 {
-	public static IDiscordClient mDiscordClient;
-	public static Globals mLuaEnv = JsePlatform.standardGlobals();
+	public static IDiscordClient mDiscordClient;					// Client instance of current user
+	public static Globals mLuaEnv = JsePlatform.standardGlobals();	// The main lua environment
+	private static String mLuaPath;
 	
 	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
 	public static void main(String[] args) 
 	{
+		mLuaPath = args[2];
+		
 		// Login into Discord
 		ClientBuilder builder = new ClientBuilder();
 		builder.withLogin(args[0], args[1]);
@@ -46,25 +49,28 @@ public class Main
 		} 
 		catch (DiscordException e) 
 		{
-			System.err.println("Error occurred while logging in!");
+			System.err.println("[JAVA][Main] Error occurred while logging in!");
 			e.printStackTrace();
-		}
-		
-		// load Lua
-		try
-		{
-			registerLuaFunctions(); // Register lua functions
-			mLuaEnv.get("dofile").call(args[2]); // Execute lua main file
-		} 
-		catch (LuaError err)
-		{
-			System.err.println("Error occured while loading lua main file!");
-			err.printStackTrace();
 		}
 		
 		// Start event listener
 		EventDispatcher dispatcher = mDiscordClient.getDispatcher();
 		dispatcher.registerListener(new EventHandler());
+	}
+	
+	public static void initializeLua()
+	{
+		// load Lua
+		try
+		{
+			registerLuaFunctions(); // Register lua functions
+			mLuaEnv.get("dofile").call(mLuaPath); // Execute lua main file
+		} 
+		catch (LuaError err)
+		{
+			System.err.println("[JAVA][Main] Error occured while loading lua main file!");
+			err.printStackTrace();
+		}
 	}
 	
 	private static void registerLuaFunctions()

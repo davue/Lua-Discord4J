@@ -22,47 +22,72 @@ import org.luaj.vm2.LuaError;
 
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.*;
+import sx.blah.discord.handle.obj.IMessage;
+
 import org.luaj.vm2.LuaValue;
 
 public class EventHandler 
 {
+	// Helper functions
+	public LuaValue buildDefaultMsgTable(IMessage msg)
+	{
+		LuaValue author = LuaValue.tableOf();
+		author.set("id", msg.getAuthor().getID());
+		author.set("name", msg.getAuthor().getName());
+		
+		LuaValue channel = LuaValue.tableOf();
+		channel.set("id", msg.getChannel().getID());
+		channel.set("name", msg.getChannel().getName());
+		
+		LuaValue message = LuaValue.tableOf();
+		message.set("author", author);
+		message.set("channel", channel);
+		message.set("text", msg.getContent());
+		if(!msg.getChannel().isPrivate())
+		{
+			message.set("guild", msg.getGuild().getName());
+		}
+		
+		return message;
+	}
+	
+	
 	// Core Events
 	@EventSubscriber
 	public void onReady(ReadyEvent event) // If Discord API is ready
 	{
-		Main.mLuaEnv.get("onReady").call();
+		Main.initializeLua();
 	}
 	
 	@EventSubscriber
 	public void onDiscordDisconnected(DiscordDisconnectedEvent event) // If connection is lost
 	{
-		Main.mLuaEnv.get("onDisconnected").call(event.getReason().toString());
+		String MethodName = "onDiscordDisconnected";
+		
+		if(Main.mLuaEnv.get(MethodName).isfunction())
+		{
+			Main.mLuaEnv.get(MethodName).call(event.getReason().toString());
+		}
 	}
 	
 	// Message Events
 	@EventSubscriber
 	public void onMessageReceived(MessageReceivedEvent event)
 	{
+		String MethodName = "onMessageReceived";
+		
 		try 
 		{
-			LuaValue author = LuaValue.tableOf();
-			author.set("id", event.getMessage().getAuthor().getID());
-			author.set("name", event.getMessage().getAuthor().getName());
+			LuaValue message = buildDefaultMsgTable(event.getMessage());
 			
-			LuaValue channel = LuaValue.tableOf();
-			channel.set("id", event.getMessage().getChannel().getID());
-			channel.set("name", event.getMessage().getChannel().getName());
-			
-			LuaValue message = LuaValue.tableOf();
-			message.set("author", author);
-			message.set("channel", channel);
-			message.set("text", event.getMessage().getContent());
-			//message.set("guild", event.getMessage().getGuild().getName()); // <- this breaks execution of this function
-			
-			Main.mLuaEnv.get("onMessageReceived").call(message);
+			if(Main.mLuaEnv.get(MethodName).isfunction())
+			{
+				Main.mLuaEnv.get(MethodName).call(message);
+			}
 		} 
 		catch(LuaError e) 
 		{
+			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
 			e.printStackTrace();
 		}	
 	}
@@ -76,25 +101,20 @@ public class EventHandler
 	@EventSubscriber
 	public void onMessageDeleted(MessageDeleteEvent event)
 	{
+		String MethodName = "onMessageDeleted";
+		
 		try
 		{
-			LuaValue author = LuaValue.tableOf();
-			author.set("id", event.getMessage().getAuthor().getID());
-			author.set("name", event.getMessage().getAuthor().getName());
+			LuaValue message = buildDefaultMsgTable(event.getMessage());
 			
-			LuaValue channel = LuaValue.tableOf();
-			channel.set("id", event.getMessage().getChannel().getID());
-			channel.set("name", event.getMessage().getChannel().getName());
-			
-			LuaValue message = LuaValue.tableOf();
-			message.set("author", author);
-			message.set("channel", channel);
-			message.set("text", event.getMessage().getContent());
-			
-			Main.mLuaEnv.get("onMessageDeleted").call(message);
+			if(Main.mLuaEnv.get(MethodName).isfunction())
+			{
+				Main.mLuaEnv.get(MethodName).call(message);
+			}
 		} 
 		catch(LuaError e) 
 		{
+			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
 			e.printStackTrace();
 		}
 	}
@@ -102,60 +122,42 @@ public class EventHandler
 	@EventSubscriber
 	public void onMessageUpdated(MessageUpdateEvent event)
 	{
+		String MethodName = "onMessageUpdated";
+		
 		try
 		{
-			LuaValue author = LuaValue.tableOf();
-			author.set("id", event.getNewMessage().getAuthor().getID());
-			author.set("name", event.getNewMessage().getAuthor().getName());
-			
-			LuaValue channel = LuaValue.tableOf();
-			channel.set("id", event.getNewMessage().getChannel().getID());
-			channel.set("name", event.getNewMessage().getChannel().getName());
-			
-			LuaValue message = LuaValue.tableOf();
-			message.set("author", author);
-			message.set("channel", channel);
+			LuaValue message = buildDefaultMsgTable(event.getNewMessage());
 			message.set("oldtext", event.getOldMessage().getContent());
-			message.set("newtext", event.getNewMessage().getContent());
 			
-			Main.mLuaEnv.get("onMessageUpdated").call(message);
+			if(Main.mLuaEnv.get(MethodName).isfunction())
+			{
+				Main.mLuaEnv.get(MethodName).call(message);
+			}
 		} 
 		catch(LuaError e) 
 		{
-			if(e.getCause().getMessage() == "attempt to call nil")
-			{
-				System.out.println("Event handler not defined in lua file!");
-			}
-			else
-			{
-				System.out.println(e.getCause().getMessage());
-				e.printStackTrace();
-			}
+			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
+			e.printStackTrace();
 		}
 	}
 	
 	@EventSubscriber
 	public void onMessageAcknowledged(MessageAcknowledgedEvent event)
 	{
+		String MethodName = "onMessageAcknowledged";
+		
 		try
 		{
-			LuaValue author = LuaValue.tableOf();
-			author.set("id", event.getAcknowledgedMessage().getAuthor().getID());
-			author.set("name", event.getAcknowledgedMessage().getAuthor().getName());
+			LuaValue message = buildDefaultMsgTable(event.getAcknowledgedMessage());
 			
-			LuaValue channel = LuaValue.tableOf();
-			channel.set("id", event.getAcknowledgedMessage().getChannel().getID());
-			channel.set("name", event.getAcknowledgedMessage().getChannel().getName());
-			
-			LuaValue message = LuaValue.tableOf();
-			message.set("author", author);
-			message.set("channel", channel);
-			message.set("text", event.getAcknowledgedMessage().getContent());
-			
-			Main.mLuaEnv.get("onMessageAcknowledged").call(message);
+			if(Main.mLuaEnv.get(MethodName).isfunction())
+			{
+				Main.mLuaEnv.get(MethodName).call(message);
+			}
 		} 
 		catch(LuaError e) 
 		{
+			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
 			e.printStackTrace();
 		}
 	}
@@ -163,25 +165,20 @@ public class EventHandler
 	@EventSubscriber
 	public void onMention(MentionEvent event)
 	{
+		String MethodName = "onMention";
+		
 		try
 		{
-			LuaValue author = LuaValue.tableOf();
-			author.set("id", event.getMessage().getAuthor().getID());
-			author.set("name", event.getMessage().getAuthor().getName());
+			LuaValue message = buildDefaultMsgTable(event.getMessage());
 			
-			LuaValue channel = LuaValue.tableOf();
-			channel.set("id", event.getMessage().getChannel().getID());
-			channel.set("name", event.getMessage().getChannel().getName());
-			
-			LuaValue message = LuaValue.tableOf();
-			message.set("author", author);
-			message.set("channel", channel);
-			message.set("text", event.getMessage().getContent());
-			
-			Main.mLuaEnv.get("onMention").call(message);
+			if(Main.mLuaEnv.get(MethodName).isfunction())
+			{
+				Main.mLuaEnv.get(MethodName).call(message);
+			}
 		} 
 		catch(LuaError e) 
 		{
+			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
 			e.printStackTrace();
 		}
 	}
