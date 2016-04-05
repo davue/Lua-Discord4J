@@ -75,6 +75,8 @@ public class Main
 	
 	private static void registerLuaFunctions()
 	{
+		mLuaEnv.set("getGuilds", new GetGuilds());
+		
 		mLuaEnv.set("sendMessage", new SendMessage());
 		mLuaEnv.set("updateMessage", new UpdateMessage());
 		mLuaEnv.set("deleteMessage", new DeleteMessage());

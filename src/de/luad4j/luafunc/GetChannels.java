@@ -16,12 +16,12 @@ public class GetChannels extends OneArgFunction{
 		
 		// save name and id of every channel in a table
 		LuaValue channelListTable = LuaValue.tableOf();
-		for(IChannel channel : channelList)
+		for(int i = 0; i < channelList.size(); i++)
 		{
 			LuaValue channelTable = LuaValue.tableOf();
-			channelTable.set("name", channel.getName());
-			channelTable.set("id", channel.getID());
-			channelListTable.add(channelTable);
+			channelTable.set("name", channelList.get(i).getName());
+			channelTable.set("id", channelList.get(i).getID());
+			channelListTable.set(i+1, channelTable);
 		}
 		
 		return channelListTable;
