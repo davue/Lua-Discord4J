@@ -78,5 +78,9 @@ public class Main
 		mLuaEnv.set("sendMessage", new SendMessage());
 		mLuaEnv.set("updateMessage", new UpdateMessage());
 		mLuaEnv.set("deleteMessage", new DeleteMessage());
+		
+		mLuaEnv.set("getChannels", new GetChannels());
+		mLuaEnv.set("joinVoiceChannel", new JoinVoiceChannel());
+		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
 	}
 }
