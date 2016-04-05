@@ -22,6 +22,7 @@ import org.luaj.vm2.LuaError;
 
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.*;
+import de.luad4j.events.*;
 import sx.blah.discord.handle.obj.IMessage;
 
 import org.luaj.vm2.LuaValue;
@@ -52,7 +53,8 @@ public class EventHandler
 	}
 	
 	// Custom Events
-	public void onLuaError(LuaError event)
+	@EventSubscriber
+	public void onLuaError(LuaErrorEvent event)
 	{
 		if(Main.mLuaEnv.get("onLuaError").isfunction())
 		{
@@ -63,7 +65,6 @@ public class EventHandler
 			System.out.println("[JAVA][EventHandler] onLuaError(string: reason) undefined. It is recommended to define a LuaError event handler.");
 		}
 	}
-	
 	
 	// Core Events
 	@EventSubscriber
@@ -86,7 +87,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			onLuaError(e);
+			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}	
 	}
 	
@@ -108,7 +109,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			onLuaError(e);
+			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}	
 	}
 	
@@ -135,7 +136,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			onLuaError(e);
+			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}
 	}
 	
@@ -157,7 +158,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			onLuaError(e);
+			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}
 	}
 	
@@ -178,7 +179,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			onLuaError(e);
+			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}
 	}
 	
@@ -199,7 +200,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			onLuaError(e);
+			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}
 	}
 	
