@@ -8,10 +8,11 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import de.luad4j.Main;
 import sx.blah.discord.handle.obj.IGuild;
 
-public class GetGuilds extends ZeroArgFunction{
-
+public class GetGuilds extends ZeroArgFunction
+{
 	@Override
-	public LuaValue call() {
+	public LuaValue call() 
+	{
 		List<IGuild> guildList = Main.mDiscordClient.getGuilds();
 		
 		// save name and id of every channel in a table
