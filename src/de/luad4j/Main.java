@@ -85,5 +85,11 @@ public class Main
 		mLuaEnv.set("getVoiceChannels", new GetVoiceChannels());
 		mLuaEnv.set("joinVoiceChannel", new JoinVoiceChannel());
 		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
+		
+		mLuaEnv.set("queueFile", new QueueFile());
+		mLuaEnv.set("clearQueue", new ClearQueue());
+		mLuaEnv.set("resumeAudio", new ResumeAudio());
+		mLuaEnv.set("pauseAudio", new PauseAudio());
+		mLuaEnv.set("setAudioVolume", new SetAudioVolume());
 	}
 }

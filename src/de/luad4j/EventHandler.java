@@ -51,6 +51,19 @@ public class EventHandler
 		return message;
 	}
 	
+	// Custom Events
+	public void onLuaError(LuaError event)
+	{
+		if(Main.mLuaEnv.get("onLuaError").isfunction())
+		{
+			Main.mLuaEnv.get("onLuaError").call(event.getMessage());
+		}
+		else
+		{
+			System.out.println("[JAVA][EventHandler] onLuaError(string: reason) undefined. It is recommended to define a LuaError event handler.");
+		}
+	}
+	
 	
 	// Core Events
 	@EventSubscriber
@@ -63,11 +76,18 @@ public class EventHandler
 	public void onDiscordDisconnected(DiscordDisconnectedEvent event) // If connection is lost
 	{
 		String MethodName = "onDiscordDisconnected";
-		
-		if(Main.mLuaEnv.get(MethodName).isfunction())
+		try
 		{
-			Main.mLuaEnv.get(MethodName).call(event.getReason().toString());
-		}
+			if(Main.mLuaEnv.get(MethodName).isfunction())
+			{
+				Main.mLuaEnv.get(MethodName).call(LuaValue.valueOf(event.getReason().toString()));
+			}
+		} 
+		catch(LuaError e) 
+		{
+			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
+			onLuaError(e);
+		}	
 	}
 	
 	// Message Events
@@ -88,7 +108,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
-			e.printStackTrace();
+			onLuaError(e);
 		}	
 	}
 	
@@ -115,7 +135,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
-			e.printStackTrace();
+			onLuaError(e);
 		}
 	}
 	
@@ -137,7 +157,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
-			e.printStackTrace();
+			onLuaError(e);
 		}
 	}
 	
@@ -158,7 +178,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
-			e.printStackTrace();
+			onLuaError(e);
 		}
 	}
 	
@@ -179,7 +199,7 @@ public class EventHandler
 		catch(LuaError e) 
 		{
 			System.err.println("[JAVA][EventHandler] A Lua error occured while calling event: " + MethodName);
-			e.printStackTrace();
+			onLuaError(e);
 		}
 	}
 	
