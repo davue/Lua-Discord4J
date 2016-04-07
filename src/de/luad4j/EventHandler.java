@@ -66,6 +66,15 @@ public class EventHandler
 		}
 	}
 	
+	@EventSubscriber
+	public void onPortData(PortDataEvent event)
+	{
+		if(Main.mLuaEnv.get("onPortData").isfunction())
+		{
+			Main.mLuaEnv.get("onPortData").call(event.getMessage());
+		}
+	}
+	
 	// Core Events
 	@EventSubscriber
 	public void onReady(ReadyEvent event) // If Discord API is ready

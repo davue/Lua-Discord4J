@@ -53,6 +53,13 @@ public class Main
 			e.printStackTrace();
 		}
 		
+		// Start port listener if desired
+		if(args.length == 4)
+		{
+			PortListener listener = new PortListener(Integer.valueOf(args[3]).intValue());
+			listener.start();
+		}
+
 		// Start event listener
 		EventDispatcher dispatcher = mDiscordClient.getDispatcher();
 		dispatcher.registerListener(new EventHandler());
