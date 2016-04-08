@@ -19,10 +19,10 @@ public class GetGuilds extends ZeroArgFunction
 		LuaValue guildListTable = LuaValue.tableOf();
 		for(int i = 0; i < guildList.size(); i++)
 		{
-			LuaValue channelTable = LuaValue.tableOf();
-			channelTable.set("name", guildList.get(i).getName());
-			channelTable.set("id", guildList.get(i).getID());
-			guildListTable.set(i+1, channelTable);
+			LuaValue guildTable = LuaValue.tableOf();
+			guildTable.set("name", guildList.get(i).getName());
+			guildTable.set("id", guildList.get(i).getID());
+			guildListTable.set(i+1, guildTable);
 		}
 		
 		return guildListTable;
