@@ -8,8 +8,8 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import de.luad4j.Main;
 import sx.blah.discord.handle.obj.IRole;
 
-public class GetRoles extends TwoArgFunction{
-
+public class GetRoles extends TwoArgFunction
+{
 	@Override
 	public LuaValue call(LuaValue userid, LuaValue guildid) 
 	{
