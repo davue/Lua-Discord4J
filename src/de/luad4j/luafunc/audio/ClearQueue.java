@@ -1,4 +1,4 @@
-package de.luad4j.luafunc;
+package de.luad4j.luafunc.audio;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;

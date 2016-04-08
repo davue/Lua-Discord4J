@@ -83,22 +83,25 @@ public class Main
 	
 	private static void registerLuaFunctions()
 	{
-		mLuaEnv.set("getGuilds", new GetGuilds());
-		
-		mLuaEnv.set("sendMessage", new SendMessage());
-		mLuaEnv.set("updateMessage", new UpdateMessage());
+		// luafunc functions
 		mLuaEnv.set("deleteMessage", new DeleteMessage());
-		
 		mLuaEnv.set("getChannels", new GetChannels());
+		mLuaEnv.set("getGuilds", new GetGuilds());
+		mLuaEnv.set("getRoles", new GetRoles());
+		mLuaEnv.set("sendMessage", new SendMessage());
+		mLuaEnv.set("setGame", new SetGame());
+		mLuaEnv.set("updateMessage", new UpdateMessage());
+
+		// luafunc.audio functions
+		mLuaEnv.set("clearQueue", new ClearQueue());
 		mLuaEnv.set("getVoiceChannels", new GetVoiceChannels());
 		mLuaEnv.set("joinVoiceChannel", new JoinVoiceChannel());
 		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
-		
+		mLuaEnv.set("pauseAudio", new PauseAudio());
 		mLuaEnv.set("queueFile", new QueueFile());
 		mLuaEnv.set("queueURL", new QueueURL());
-		mLuaEnv.set("clearQueue", new ClearQueue());
 		mLuaEnv.set("resumeAudio", new ResumeAudio());
-		mLuaEnv.set("pauseAudio", new PauseAudio());
 		mLuaEnv.set("setAudioVolume", new SetAudioVolume());
+		mLuaEnv.set("skipAudio", new SkipAudio());
 	}
 }
