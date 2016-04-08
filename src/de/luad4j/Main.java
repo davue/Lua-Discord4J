@@ -23,6 +23,7 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import de.luad4j.luafunc.*;
+import de.luad4j.luafunc.audio.*;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
@@ -94,6 +95,7 @@ public class Main
 		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
 		
 		mLuaEnv.set("queueFile", new QueueFile());
+		mLuaEnv.set("queueURL", new QueueURL());
 		mLuaEnv.set("clearQueue", new ClearQueue());
 		mLuaEnv.set("resumeAudio", new ResumeAudio());
 		mLuaEnv.set("pauseAudio", new PauseAudio());

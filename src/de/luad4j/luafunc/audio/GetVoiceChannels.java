@@ -1,4 +1,4 @@
-package de.luad4j.luafunc;
+package de.luad4j.luafunc.audio;
 
 import java.util.List;
 

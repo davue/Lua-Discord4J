@@ -23,16 +23,23 @@ public class PortListener extends Thread
 		ServerSocket serverSocket;
 		try 
 		{
+			serverSocket = new ServerSocket(mPort);
+
 			while (true)
 			{
-				serverSocket = new ServerSocket(mPort);
 				Socket socket = serverSocket.accept();
 				
 				BufferedReader in = new BufferedReader (new InputStreamReader (socket.getInputStream ()));
-
-				Main.mDiscordClient.getDispatcher().dispatch(new PortDataEvent(in.readLine()));
 				
-				socket.close();
+				String line = "";
+				String message = "";
+				while((line=in.readLine()) != null)
+				{
+					message = message + line + "\n";
+					line = "";
+				}
+				
+				Main.mDiscordClient.getDispatcher().dispatch(new PortDataEvent(message));
 			}
 		} 
 		catch (IOException e) 

@@ -40,13 +40,21 @@ public class EventHandler
 		channel.set("id", msg.getChannel().getID());
 		channel.set("name", msg.getChannel().getName());
 		
+		LuaValue guild = LuaValue.tableOf();
+		if(!msg.getChannel().isPrivate())
+		{
+			guild.set("id", msg.getGuild().getID());
+			guild.set("name", msg.getGuild().getName());
+		}
+		
 		LuaValue message = LuaValue.tableOf();
 		message.set("author", author);
 		message.set("channel", channel);
 		message.set("text", msg.getContent());
+		message.set("id", msg.getID());
 		if(!msg.getChannel().isPrivate())
 		{
-			message.set("guild", msg.getGuild().getName());
+			message.set("guild", guild);
 		}
 		
 		return message;

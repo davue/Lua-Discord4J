@@ -1,4 +1,4 @@
-package de.luad4j.luafunc;
+package de.luad4j.luafunc.audio;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
@@ -6,14 +6,14 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import de.luad4j.Main;
 import sx.blah.discord.util.DiscordException;
 
-public class QueueFile extends TwoArgFunction {
-
+public class QueueURL extends TwoArgFunction
+{
 	@Override
-	public LuaValue call(LuaValue voicechannelid, LuaValue filepath) 
+	public LuaValue call(LuaValue voicechannelid, LuaValue url) 
 	{
 		try 
 		{
-			Main.mDiscordClient.getVoiceChannelByID(voicechannelid.tojstring()).getAudioChannel().queueFile(filepath.tojstring());
+			Main.mDiscordClient.getVoiceChannelByID(voicechannelid.tojstring()).getAudioChannel().queueUrl(url.tojstring());
 			return LuaValue.NIL;
 		} 
 		catch (DiscordException e) 
