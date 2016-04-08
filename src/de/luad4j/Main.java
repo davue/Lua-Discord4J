@@ -39,11 +39,55 @@ public class Main
 	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
 	public static void main(String[] args) 
 	{
-		mLuaPath = args[2];
-		
-		// Login into Discord
-		ClientBuilder builder = new ClientBuilder();
-		builder.withLogin(args[0], args[1]);
+		if(args.length >= 4)
+		{			
+			if(args[0] == "-user")
+			{
+				mLuaPath = args[3];
+				
+				// Login into Discord
+				ClientBuilder builder = new ClientBuilder();
+				builder.withLogin(args[1], args[2]);
+				
+				loginDiscord(builder);
+			}
+			else if(args[0] == "-bot")
+			{
+				mLuaPath = args[2];
+				
+				// Login into Discord
+				ClientBuilder builder = new ClientBuilder();
+				builder.withToken(args[1]);
+				
+				loginDiscord(builder);
+			}
+			else
+			{
+				System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
+				System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
+			}
+
+			
+			// Start port listener if desired
+			if(args[args.length-1] != mLuaPath)
+			{
+				PortListener listener = new PortListener(Integer.valueOf(args[args.length-1]).intValue());
+				listener.start();
+			}
+
+			// Start event listener
+			EventDispatcher dispatcher = mDiscordClient.getDispatcher();
+			dispatcher.registerListener(new EventHandler());
+		}
+		else
+		{
+			System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
+			System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
+		}
+	}
+	
+	public static void loginDiscord(ClientBuilder builder)
+	{
 		try 
 		{
 			mDiscordClient = builder.login(); // Builds the IDiscordClient instance and logs it in
@@ -53,17 +97,6 @@ public class Main
 			System.err.println("[JAVA][Main] Error occurred while logging in!");
 			e.printStackTrace();
 		}
-		
-		// Start port listener if desired
-		if(args.length == 4)
-		{
-			PortListener listener = new PortListener(Integer.valueOf(args[3]).intValue());
-			listener.start();
-		}
-
-		// Start event listener
-		EventDispatcher dispatcher = mDiscordClient.getDispatcher();
-		dispatcher.registerListener(new EventHandler());
 	}
 	
 	public static void initializeLua()
