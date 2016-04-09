@@ -41,7 +41,7 @@ public class Main
 	{
 		if(args.length >= 4)
 		{			
-			if(args[0] == "-user")
+			if(args[0].equals("-user"))
 			{
 				mLuaPath = args[3];
 				
@@ -51,7 +51,7 @@ public class Main
 				
 				loginDiscord(builder);
 			}
-			else if(args[0] == "-bot")
+			else if(args[0].equals("-bot"))
 			{
 				mLuaPath = args[2];
 				
@@ -65,14 +65,19 @@ public class Main
 			{
 				System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
 				System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
+				System.exit(0);
 			}
 
 			
 			// Start port listener if desired
-			if(args[args.length-1] != mLuaPath)
+			if(!args[args.length-1].equals(mLuaPath))
 			{
 				PortListener listener = new PortListener(Integer.valueOf(args[args.length-1]).intValue());
 				listener.start();
+			}
+			else
+			{
+				System.out.println("[INFO] Running without port listener.");
 			}
 
 			// Start event listener
@@ -83,6 +88,7 @@ public class Main
 		{
 			System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
 			System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
+			System.exit(0);
 		}
 	}
 	
@@ -128,6 +134,8 @@ public class Main
 		// luafunc.audio functions
 		mLuaEnv.set("clearQueue", new ClearQueue());
 		mLuaEnv.set("getVoiceChannels", new GetVoiceChannels());
+		mLuaEnv.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
+		mLuaEnv.set("isConnectedToVoice", new IsConnectedToVoiceChannel());
 		mLuaEnv.set("joinVoiceChannel", new JoinVoiceChannel());
 		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
 		mLuaEnv.set("pauseAudio", new PauseAudio());

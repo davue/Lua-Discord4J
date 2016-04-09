@@ -225,13 +225,37 @@ public class EventHandler
 	@EventSubscriber
 	public void onAudioPlay(AudioPlayEvent event)
 	{
+		LuaValue audio = LuaValue.tableOf();
 		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
 	}
 	
 	@EventSubscriber
 	public void onAudioQueued(AudioQueuedEvent event)
 	{
+		LuaValue audio = LuaValue.tableOf();
 		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
 	}
 	
 	@EventSubscriber
@@ -243,12 +267,36 @@ public class EventHandler
 	@EventSubscriber
 	public void onAudioStop(AudioStopEvent event)
 	{
+		LuaValue audio = LuaValue.tableOf();
 		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
 	}
 	
 	@EventSubscriber
 	public void onAudioUnqueued(AudioUnqueuedEvent event)
 	{
+		LuaValue audio = LuaValue.tableOf();
 		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
 	}
 }

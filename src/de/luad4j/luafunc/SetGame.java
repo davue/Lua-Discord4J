@@ -14,7 +14,7 @@ public class SetGame extends OneArgFunction
 	{
 		try
 		{
-			Main.mDiscordClient.updatePresence(true, Optional.of(game.tojstring()));
+			Main.mDiscordClient.updatePresence(false, Optional.of(game.tojstring()));
 			return LuaValue.NIL;
 		}
 		catch (NullPointerException e)
