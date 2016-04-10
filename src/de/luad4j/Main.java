@@ -22,13 +22,16 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+
 import de.luad4j.luafunc.*;
 import de.luad4j.luafunc.audio.*;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
-
 
 public class Main 
 {
@@ -41,6 +44,9 @@ public class Main
 	{
 		if(args.length >= 4)
 		{			
+			Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+			root.setLevel(Level.ERROR);
+			
 			if(args[0].equals("-user"))
 			{
 				mLuaPath = args[3];
@@ -134,8 +140,10 @@ public class Main
 
 		// luafunc.audio functions
 		mLuaEnv.set("clearQueue", new ClearQueue());
-		mLuaEnv.set("getVoiceChannels", new GetVoiceChannels());
+		mLuaEnv.set("getConnectedUsers", new GetConnectedUsers());
 		mLuaEnv.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
+		mLuaEnv.set("getQueueSize", new GetQueueSize());
+		mLuaEnv.set("getVoiceChannels", new GetVoiceChannels());
 		mLuaEnv.set("isConnectedToVoice", new IsConnectedToVoiceChannel());
 		mLuaEnv.set("joinVoiceChannel", new JoinVoiceChannel());
 		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
