@@ -129,6 +129,7 @@ public class Main
 		mLuaEnv.set("getRoles", new GetRoles());
 		mLuaEnv.set("sendMessage", new SendMessage());
 		mLuaEnv.set("setGame", new SetGame());
+		mLuaEnv.set("setTimer", new SetTimer());
 		mLuaEnv.set("updateMessage", new UpdateMessage());
 
 		// luafunc.audio functions
