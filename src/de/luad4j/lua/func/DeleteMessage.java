@@ -1,21 +1,21 @@
-package de.luad4j.luafunc;
+package de.luad4j.lua.func;
 
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 
 import de.luad4j.Main;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MissingPermissionsException;
 
-public class UpdateMessage extends ThreeArgFunction 
+public class DeleteMessage extends TwoArgFunction 
 {
 	@Override
-	public LuaValue call(LuaValue channelid, LuaValue messageid, LuaValue newtext) 
-	{	
+	public LuaValue call(LuaValue channelid, LuaValue messageid) 
+	{
 		try 
 		{
-			Main.mDiscordClient.getChannelByID(channelid.tojstring()).getMessageByID(messageid.tojstring()).edit(newtext.tojstring());
+			Main.mDiscordClient.getChannelByID(channelid.tojstring()).getMessageByID(messageid.tojstring()).delete();
 			return LuaValue.NIL;
 		} 
 		catch (HTTP429Exception e)

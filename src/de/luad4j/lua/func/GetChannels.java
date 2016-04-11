@@ -1,19 +1,19 @@
-package de.luad4j.luafunc.audio;
+package de.luad4j.lua.func;
 
 import java.util.List;
 
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2.lib.OneArgFunction;
 
 import de.luad4j.Main;
-import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.handle.obj.IChannel;
 
-public class GetConnectedVoiceChannels extends ZeroArgFunction
+public class GetChannels extends OneArgFunction
 {
 	@Override
-	public LuaValue call()
+	public LuaValue call(LuaValue guildid) 
 	{
-		List<IVoiceChannel> channelList = Main.mDiscordClient.getConnectedVoiceChannels();
+		List<IChannel> channelList = Main.mDiscordClient.getGuildByID(guildid.tojstring()).getChannels();
 		
 		// save name and id of every channel in a table
 		LuaValue channelListTable = LuaValue.tableOf();

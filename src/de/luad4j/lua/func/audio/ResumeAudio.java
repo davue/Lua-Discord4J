@@ -1,4 +1,4 @@
-package de.luad4j.luafunc.audio;
+package de.luad4j.lua.func.audio;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
@@ -6,14 +6,15 @@ import org.luaj.vm2.lib.OneArgFunction;
 import de.luad4j.Main;
 import sx.blah.discord.util.DiscordException;
 
-public class ClearQueue extends OneArgFunction
+public class ResumeAudio extends OneArgFunction
 {
+
 	@Override
-	public LuaValue call(LuaValue voicechannelid) 
-	{
+	public LuaValue call(LuaValue voicechannelid) {
+		
 		try 
 		{
-			Main.mDiscordClient.getVoiceChannelByID(voicechannelid.tojstring()).getAudioChannel().clearQueue();
+			Main.mDiscordClient.getVoiceChannelByID(voicechannelid.tojstring()).getAudioChannel().resume();
 			return LuaValue.NIL;
 		} 
 		catch (DiscordException e) 

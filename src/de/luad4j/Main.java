@@ -25,9 +25,8 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-
-import de.luad4j.luafunc.*;
-import de.luad4j.luafunc.audio.*;
+import de.luad4j.lua.func.*;
+import de.luad4j.lua.func.audio.*;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
