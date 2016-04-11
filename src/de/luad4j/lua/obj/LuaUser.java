@@ -21,6 +21,8 @@ package de.luad4j.lua.obj;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.luad4j.Main;
 import sx.blah.discord.handle.obj.IUser;
@@ -32,6 +34,8 @@ public class LuaUser
 {
 	private IUser		mUser;			// User object inside Java
 	private LuaValue	mLuaUser;		// Table: User object inside Lua
+	
+	private static final Logger logger = LoggerFactory.getLogger(LuaUser.class);	// Logger of this class
 	
 	// Constructor
 	public LuaUser(IUser user)
@@ -200,17 +204,20 @@ public class LuaUser
 			} 
 			catch (DiscordException e) 
 			{
+				logger.error(e.getErrorMessage());
 				return LuaValue.valueOf("DiscordException");
 			} 
 			catch (HTTP429Exception e) 
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf("HTTP429Exception");
 			} 
 			catch (MissingPermissionsException e) 
 			{
+				logger.error(e.getErrorMessage());
 				return LuaValue.valueOf("MissingPermissionsException");
 			}
-
+			
 			return LuaValue.NIL;
 		}
 	}
