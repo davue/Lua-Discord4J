@@ -12,8 +12,8 @@ import sx.blah.discord.util.MissingPermissionsException;
 
 public class LuaUser
 {
-	private IUser		mUser;			// IUser object of user inside Java
-	private LuaValue	mLuaUser;		// Table: user object inside Lua
+	private IUser		mUser;			// User object inside Java
+	private LuaValue	mLuaUser;		// Table: User object inside Lua
 	
 	// Constructor
 	public LuaUser(IUser user)
