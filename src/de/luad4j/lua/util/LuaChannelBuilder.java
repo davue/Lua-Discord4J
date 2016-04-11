@@ -13,6 +13,7 @@ public class LuaChannelBuilder
 		luachannel.set("name", channel.getName());
 		luachannel.set("creation", channel.getCreationDate().toString());
 		luachannel.set("topic", channel.getTopic());
+		luachannel.set("isprivate", LuaValue.valueOf(channel.isPrivate()));
 		// guild field?
 		
 		return luachannel;

@@ -12,8 +12,6 @@ public class LuaVoiceChannelBuilder
 		LuaValue luachannel = LuaValue.tableOf();
 		luachannel.set("id", channel.getID());
 		luachannel.set("name", channel.getName());
-		luachannel.set("creation", channel.getCreationDate().toString());
-		luachannel.set("queuesize", channel.getAudioChannel().getQueueSize());
 		return luachannel;
 	}
 }
