@@ -19,6 +19,7 @@
 package de.luad4j.lua.obj;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import org.luaj.vm2.LuaValue;
@@ -31,8 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.luad4j.Main;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IInvite;
 import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.Image;
@@ -181,6 +185,7 @@ public class LuaGuild
 		}
 	}
 	
+	// TODO: implement LuaChannel
 	private class CreateChannel extends OneArgFunction
 	{
 		@Override
@@ -200,6 +205,7 @@ public class LuaGuild
 		}
 	}
 	
+	// TODO: implement LuaRole
 	private class CreateRole extends ZeroArgFunction
 	{
 		@Override
@@ -219,6 +225,7 @@ public class LuaGuild
 		}
 	}
 	
+	// TODO: implement LuaVoiceChannel
 	private class CreateVoiceChannel extends OneArgFunction
 	{
 		@Override
@@ -282,6 +289,7 @@ public class LuaGuild
 		}
 	}
 	
+	// TODO: implement LuaChannel
 	private class GetAFKChannel extends ZeroArgFunction
 	{
 		@Override
@@ -297,13 +305,167 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			LuaValue.valueOf(mGuild.getAFKTimeout());
+			return LuaValue.valueOf(mGuild.getAFKTimeout());
+		}
+	}
+	
+	// TODO: implement LuaAudioChannel
+	private class GetAudioChannel extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*try
+			{
+				return (new LuaAudioChannel(mGuild.getAudioChannel())).getTable();
+			}
+			catch(DiscordException e)
+			{
+				logger.error(e.getMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}*/
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetBannedUsers extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			List<IUser> bannedUsers;
+			try
+			{
+				bannedUsers = mGuild.getBannedUsers();
+				LuaValue luaBannedUsers = LuaValue.tableOf();
+				for(IUser user : bannedUsers)
+				{
+					luaBannedUsers.set(luaBannedUsers.length()+1, (new LuaUser(user)).getTable());
+				}
+				
+				return luaBannedUsers;
+			}
+			catch (HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+	
+	// TODO: implement LuaChannel
+	private class GetChannelByID extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue channelID)
+		{
+			//return (new LuaChannel(mGuild.getChannelByID(channelID.tojstring()))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaChannel
+	private class GetChannels extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*List<IChannel> channels = mGuild.getChannels();
+			LuaValue luaChannels = LuaValue.tableOf();
+			for(IChannel channel : channels)
+			{
+				luaChannels.set(luaChannels.length()+1, (new LuaChannel(channel)).getTable());
+			}
+			
+			return luaChannels;*/
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetCreationDate extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mGuild.getCreationDate().toString());
+		}
+	}
+	
+	// TODO: implement LuaRole
+	private class GetEveryoneRole extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			//return (new LuaRole(mGuild.getEveryoneRole())).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetIcon extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mGuild.getIcon());
+		}
+	}
+	
+	private class GetIconURL extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mGuild.getIconURL());
+		}
+	}
+	
+	private class GetID extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mGuild.getID());
+		}
+	}
+	
+	private class GetInvites extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*try
+			{
+				List<IInvite> invites = mGuild.getInvites();
+				LuaValue luaInvites = LuaValue.tableOf();
+				for(IInvite invite : invites)
+				{
+					luaInvites.set(luaInvites.length()+1, (new LuaInvite(invite)).getTable());
+				}
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				logger.error(e.getMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}*/
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetName extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mGuild.getName());
 		}
 	}
 	
 	public LuaValue getTable()
 	{
-		mGuild.
 		return mLuaGuild;
 	}
 }
