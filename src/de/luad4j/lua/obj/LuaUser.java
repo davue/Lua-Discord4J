@@ -46,7 +46,6 @@ public class LuaUser
 		mLuaUser = LuaValue.tableOf();
 		mLuaUser.set("getAvatar", new getAvatar());
 		mLuaUser.set("getAvatarURL", new getAvatarURL());
-		mLuaUser.set("getClient", new getClient());
 		mLuaUser.set("getCreationDate", new getCreationDate());
 		mLuaUser.set("getDiscriminator", new getDiscriminator());
 		mLuaUser.set("getGame", new getGame());
@@ -75,17 +74,6 @@ public class LuaUser
 		public LuaValue call() 
 		{
 			return LuaValue.valueOf(mUser.getAvatarURL());
-		}
-	}
-	
-	// TODO: implement LuaClient object
-	class getClient extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call() 
-		{
-			//return (new LuaClient(mUser.getClient())).getTable();
-			return LuaValue.NIL;
 		}
 	}
 	
@@ -202,20 +190,20 @@ public class LuaUser
 			{
 				mUser.moveToVoiceChannel(Main.mDiscordClient.getVoiceChannelByID(channelid.tojstring()));
 			} 
-			catch (DiscordException e) 
+			catch (MissingPermissionsException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException");
+				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
 			} 
 			catch (HTTP429Exception e) 
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception");
+				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
 			} 
-			catch (MissingPermissionsException e) 
+			catch (DiscordException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException");
+				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
 			}
 			
 			return LuaValue.NIL;

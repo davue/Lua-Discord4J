@@ -18,17 +18,136 @@
 
 package de.luad4j.lua.obj;
 
+import java.io.File;
+
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
 
+import de.luad4j.Main;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.HTTP429Exception;
+import sx.blah.discord.util.Image;
 
-public class LuaClient 
+// Client is a global lua table -> no getClient() lua implementation needed for other objects
+
+public class LuaClient
 {
-	private IDiscordClient 	mClient;	// Client object inside Java
-	private LuaValue		mLuaClient;	// Table: Client object inside Lua
-	
+	private static IDiscordClient mClient; // Client object inside Java
+	private static LuaValue mLuaClient; // Table: Client object inside Lua
+
 	public LuaClient()
 	{
-		
+		// Init only once
+		if (mClient == null)
+		{
+			mClient = Main.mDiscordClient;
+		}
+
+		if (mLuaClient == null)
+		{
+			// Init Lua
+			mLuaClient = LuaValue.tableOf();
+		}
+	}
+
+	static class changeAvatar extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue filepath)
+		{
+			if (filepath != LuaValue.NIL)
+			{
+				File file = new File(filepath.tojstring());
+				try
+				{
+					mClient.changeAvatar(Image.forFile(file));
+					return LuaValue.NIL;
+				}
+				catch (DiscordException | HTTP429Exception e)
+				{
+					return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+				}
+			}
+			else
+			{
+				try
+				{
+					mClient.changeAvatar(Image.defaultAvatar());
+					return LuaValue.NIL;
+				}
+				catch (DiscordException | HTTP429Exception e)
+				{
+					return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+				}
+			}
+		}
+	}
+
+	static class changeEmail extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue email)
+		{
+			try
+			{
+				mClient.changeEmail(email.tojstring());
+				return LuaValue.NIL;
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+
+	static class changePassword extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue password)
+		{
+			try
+			{
+				mClient.changePassword(password.tojstring());
+				return LuaValue.NIL;
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+
+	static class changeUsername extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue username)
+		{
+			try
+			{
+				mClient.changeUsername(username.tojstring());
+				return LuaValue.NIL;
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+
+	// TODO: get a region from somewhere
+	static class createGuild extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue guildname)
+		{
+			//mClient.createGuild(name, (new Region()))
+			return LuaValue.NIL;
+		}
+	}
+
+	static public LuaValue getTable()
+	{
+		return mLuaClient;
 	}
 }

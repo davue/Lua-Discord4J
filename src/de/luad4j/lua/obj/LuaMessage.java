@@ -42,6 +42,22 @@ public class LuaMessage
 		
 		// Init Lua
 		mLuaMessage = LuaValue.tableOf();
+		mLuaMessage.set("acknowledge", new acknowledge());
+		mLuaMessage.set("delete", new delete());
+		mLuaMessage.set("edit", new edit());
+		mLuaMessage.set("getAttachments", new getAttachments());
+		mLuaMessage.set("getAuthor", new getAuthor());
+		mLuaMessage.set("getChannel", new getChannel());
+		mLuaMessage.set("getContent", new getContent());
+		mLuaMessage.set("getCreationDate", new getCreationDate());
+		mLuaMessage.set("getEditedTimestamp", new getEditedTimestamp());
+		mLuaMessage.set("getGuild", new getGuild());
+		mLuaMessage.set("getID", new getID());
+		mLuaMessage.set("getMentions", new getMentions());
+		mLuaMessage.set("getTimestamp", new getTimestamp());
+		mLuaMessage.set("isAcknowledged", new isAcknowledged());
+		mLuaMessage.set("mentionsEveryone", new mentionsEveryone());
+		mLuaMessage.set("reply", new reply());
 	}
 	
 	class acknowledge extends ZeroArgFunction
@@ -56,12 +72,12 @@ public class LuaMessage
 			catch (HTTP429Exception e) 
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception");
+				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
 			} 
 			catch (DiscordException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException");
+				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
 			}
 			
 			return LuaValue.NIL;
@@ -80,17 +96,17 @@ public class LuaMessage
 			catch (MissingPermissionsException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException");
+				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
 			} 
 			catch (HTTP429Exception e) 
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception");
+				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
 			} 
 			catch (DiscordException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException");
+				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
 			}
 			
 			return LuaValue.NIL;
@@ -109,17 +125,17 @@ public class LuaMessage
 			catch (MissingPermissionsException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException");
+				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
 			} 
 			catch (HTTP429Exception e) 
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception");
+				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
 			} 
 			catch (DiscordException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException");
+				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
 			}
 		}
 	}
@@ -259,17 +275,17 @@ public class LuaMessage
 			catch (MissingPermissionsException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException");
+				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
 			} 
 			catch (HTTP429Exception e) 
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception");
+				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
 			} 
 			catch (DiscordException e) 
 			{
 				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException");
+				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
 			}
 		}
 	}
