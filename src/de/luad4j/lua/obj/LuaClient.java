@@ -19,15 +19,26 @@
 package de.luad4j.lua.obj;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
+import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.VarArgFunction;
 
 import de.luad4j.Main;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRegion;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.Image;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 
 // Client is a global lua table -> no getClient() lua implementation needed for other objects
 
@@ -48,10 +59,36 @@ public class LuaClient
 		{
 			// Init Lua
 			mLuaClient = LuaValue.tableOf();
+			mLuaClient.set("changeAvatar", new ChangeAvatar());
+			mLuaClient.set("changeEmail", new ChangeEmail());
+			mLuaClient.set("changePassword", new ChangePassword());
+			mLuaClient.set("changeUsername", new ChangeUsername());
+			mLuaClient.set("createGuild", new CreateGuild());
+			mLuaClient.set("getChannelByID", new GetChannelByID());
+			mLuaClient.set("getChannels", new GetChannels());
+			mLuaClient.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
+			mLuaClient.set("getGuildByID", new GetGuildByID());
+			mLuaClient.set("geGuilds", new GetGuilds());
+			mLuaClient.set("getInviteForCode", new GetInviteForCode());
+			mLuaClient.set("getLaunchTime", new GetLaunchTime());
+			mLuaClient.set("getOrCreatePMChannel", new GetOrCreatePMChannel());
+			mLuaClient.set("getOutUser", new GetOurUser());
+			mLuaClient.set("getRegionByID", new GetRegionByID());
+			mLuaClient.set("getRegions", new GetRegions());
+			mLuaClient.set("getResponseTime", new GetResponseTime());
+			mLuaClient.set("getToken", new GetToken());
+			mLuaClient.set("getUserByID", new GetUserByID());
+			mLuaClient.set("getVoiceChannelByID", new GetVoiceChannelByID());
+			mLuaClient.set("getVoiceChannels", new GetVoiceChannels());
+			mLuaClient.set("isBot", new IsBot());
+			mLuaClient.set("isReady", new IsReady());
+			mLuaClient.set("login", new Login());
+			mLuaClient.set("logout", new Logout());
+			mLuaClient.set("updatePresence", new UpdatePresence());
 		}
 	}
 
-	static class changeAvatar extends OneArgFunction
+	static class ChangeAvatar extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue filepath)
@@ -84,7 +121,7 @@ public class LuaClient
 		}
 	}
 
-	static class changeEmail extends OneArgFunction
+	static class ChangeEmail extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue email)
@@ -101,7 +138,7 @@ public class LuaClient
 		}
 	}
 
-	static class changePassword extends OneArgFunction
+	static class ChangePassword extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue password)
@@ -118,7 +155,7 @@ public class LuaClient
 		}
 	}
 
-	static class changeUsername extends OneArgFunction
+	static class ChangeUsername extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue username)
@@ -135,13 +172,291 @@ public class LuaClient
 		}
 	}
 
-	// TODO: get a region from somewhere
-	static class createGuild extends OneArgFunction
+	// TODO: implement LuaGuild
+	static class CreateGuild extends VarArgFunction
 	{
 		@Override
-		public LuaValue call(LuaValue guildname)
+		public LuaValue invoke(Varargs args)
 		{
-			//mClient.createGuild(name, (new Region()))
+			try
+			{
+				File file = new File(args.tojstring(1));
+				IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)), Optional.ofNullable(Image.forFile(file)));
+				//return new LuaGuild(guild).getTable();
+				return LuaValue.NIL;
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+
+	// TODO: implement LuaChannel
+	static class GetChannelByID extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue channelID)
+		{
+			//return (new LuaChannel(mClient.getChannelByID(channelID.tojstring()))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaChannel
+	static class GetChannels extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue includePrivate)
+		{
+			/*Collection<IChannel> channels = mClient.getChannels(includePrivate.toboolean());
+			LuaValue luaChannels = LuaValue.tableOf();
+			for(IChannel channel : channels)
+			{
+				luaChannels.set(luaChannels.length()+1, new LuaChannel(channel));
+			}
+			return luaChannels;
+			*/
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaVoiceChannel
+	static class GetConnectedVoiceChannels extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*List<IVoiceChannel> channels = mClient.getConnectedVoiceChannels();
+			LuaValue luaChannels = LuaValue.tableOf();
+			for(IChannel channel : channels)
+			{
+				luaChannels.set(luaChannels.length()+1, new LuaVoiceChannel(channel));
+			}
+			return luaChannels;*/
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaGuild
+	static class GetGuildByID extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue guildID)
+		{
+			//return (new LuaGuild(mClient.getGuildByID(guildID.tojstring()))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaGuild
+	static class GetGuilds extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*List<IGuild> guilds = mClient.getGuilds();
+			LuaValue luaGuilds = LuaValue.tableOf();
+			for(IGuild guild : guilds)
+			{
+				luaGuilds.set(luaGuilds.length()+1, new LuaGuild(guild));
+			}
+			return luaGuilds;*/
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaInvite
+	static class GetInviteForCode extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue code)
+		{
+			//return (new LuaInvite(mClient.getInviteForCode(code.tojstring()))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	static class GetLaunchTime extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mClient.getLaunchTime().toString());
+		}
+	}
+
+	// TODO: implement LuaPrivateChannel
+	static class GetOrCreatePMChannel extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID)
+		{
+			//return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring())))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	static class GetOurUser extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return (new LuaUser(mClient.getOurUser())).getTable();
+		}
+	}
+	
+	// TODO: implement LuaRegion
+	static class GetRegionByID extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue regionID)
+		{
+			//return (new LuaRegion(mClient.getRegionByID(regionID.tojstring()))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaRegion
+	static class GetRegions extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*try
+			{
+				List<IRegion> regions = mClient.getRegions();
+				
+				LuaValue luaRegions = LuaValue.tableOf();
+				for(IRegion region : regions)
+				{
+					luaRegions.set(luaRegions.length(), new LuaRegion(region));
+				}
+				return luaRegions;
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}*/
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	static class GetResponseTime extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mClient.getResponseTime());
+		}
+	}
+	
+	static class GetToken extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mClient.getToken());
+		}
+	}
+	
+	static class GetUserByID extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID)
+		{
+			return (new LuaUser(mClient.getUserByID(userID.tojstring()))).getTable();
+		}
+	}
+	
+	// TODO: implement LuaVoiceChannel
+	static class GetVoiceChannelByID extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue channelID)
+		{
+			//return (new LuaVoiceChannel(mClient.getVoiceChannelByID(channelID.tojstring()))).getTable();
+			return LuaValue.NIL;
+		}
+	}
+	
+	// TODO: implement LuaVoiceChannel
+	static class GetVoiceChannels extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			/*Collection<IVoiceChannel> channels = mClient.getVoiceChannels();
+			LuaValue luaChannels = LuaValue.tableOf();
+			for(IChannel channel : channels)
+			{
+				luaChannels.set(luaChannels.length()+1, new LuaVoiceChannel(channel));
+			}
+			return luaChannels;*/
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	static class IsBot extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mClient.isBot());
+		}
+	}
+	
+	static class IsReady extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mClient.isReady());
+		}
+	}
+	
+	static class Login extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			try
+			{
+				mClient.login();
+				return LuaValue.NIL;
+			}
+			catch (DiscordException e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+	
+	static class Logout extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			try
+			{
+				mClient.logout();
+				return LuaValue.NIL;
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+			}
+		}
+	}
+	
+	static class UpdatePresence extends TwoArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue isIdle, LuaValue game)
+		{
+			mClient.updatePresence(isIdle.toboolean(), Optional.ofNullable(game.tojstring()));
 			return LuaValue.NIL;
 		}
 	}
