@@ -44,22 +44,22 @@ public class LuaUser
 		
 		// Init Lua
 		mLuaUser = LuaValue.tableOf();
-		mLuaUser.set("getAvatar", new getAvatar());
-		mLuaUser.set("getAvatarURL", new getAvatarURL());
-		mLuaUser.set("getCreationDate", new getCreationDate());
-		mLuaUser.set("getDiscriminator", new getDiscriminator());
-		mLuaUser.set("getGame", new getGame());
-		mLuaUser.set("getID", new getID());
-		mLuaUser.set("getName", new getName());
-		mLuaUser.set("getPresence", new getPresence());
-		mLuaUser.set("getRolesForGuildID", new getRolesForGuildID());
-		mLuaUser.set("getVoiceChannel", new getVoiceChannel());
-		mLuaUser.set("isBot", new isBot());
-		mLuaUser.set("mention", new mention());
-		mLuaUser.set("moveToVoiceChannel", new moveToVoiceChannel());
+		mLuaUser.set("getAvatar", new GetAvatar());
+		mLuaUser.set("getAvatarURL", new GetAvatarURL());
+		mLuaUser.set("getCreationDate", new GetCreationDate());
+		mLuaUser.set("getDiscriminator", new GetDiscriminator());
+		mLuaUser.set("getGame", new GetGame());
+		mLuaUser.set("getID", new GetID());
+		mLuaUser.set("getName", new GetName());
+		mLuaUser.set("getPresence", new GetPresence());
+		mLuaUser.set("getRolesForGuildID", new GetRolesForGuildID());
+		mLuaUser.set("getVoiceChannel", new GetVoiceChannel());
+		mLuaUser.set("isBot", new IsBot());
+		mLuaUser.set("mention", new Mention());
+		mLuaUser.set("moveToVoiceChannel", new MoveToVoiceChannel());
 	}
 	
-	class getAvatar extends ZeroArgFunction
+	private class GetAvatar extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -68,7 +68,7 @@ public class LuaUser
 		}
 	}
 	
-	class getAvatarURL extends ZeroArgFunction
+	private class GetAvatarURL extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -77,7 +77,7 @@ public class LuaUser
 		}
 	}
 	
-	class getCreationDate extends ZeroArgFunction
+	private class GetCreationDate extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -86,7 +86,7 @@ public class LuaUser
 		}
 	}
 	
-	class getDiscriminator extends ZeroArgFunction
+	private class GetDiscriminator extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -95,7 +95,7 @@ public class LuaUser
 		}
 	}
 	
-	class getGame extends ZeroArgFunction
+	private class GetGame extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -108,7 +108,7 @@ public class LuaUser
 		}
 	}
 	
-	class getID extends ZeroArgFunction
+	private class GetID extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -117,7 +117,7 @@ public class LuaUser
 		}
 	}
 	
-	class getName extends ZeroArgFunction
+	private class GetName extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -127,7 +127,7 @@ public class LuaUser
 	}
 	
 	// TODO: implement LuaPresence object
-	class getPresence extends ZeroArgFunction
+	private class GetPresence extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -138,7 +138,7 @@ public class LuaUser
 	}
 	
 	// TODO: somehow implement a list in lua
-	class getRolesForGuildID extends OneArgFunction
+	private class GetRolesForGuildID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue guildid) 
@@ -149,7 +149,7 @@ public class LuaUser
 	}
 	
 	// TODO: implement LuaVoiceChannel object
-	class getVoiceChannel extends ZeroArgFunction
+	private class GetVoiceChannel extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -163,7 +163,7 @@ public class LuaUser
 		}
 	}
 	
-	class isBot extends ZeroArgFunction
+	private class IsBot extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -172,7 +172,7 @@ public class LuaUser
 		}
 	}
 	
-	class mention extends ZeroArgFunction
+	private class Mention extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -181,29 +181,19 @@ public class LuaUser
 		}
 	}
 	
-	class moveToVoiceChannel extends OneArgFunction
+	private class MoveToVoiceChannel extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue channelid) 
 		{
-			try 
+			try
 			{
 				mUser.moveToVoiceChannel(Main.mDiscordClient.getVoiceChannelByID(channelid.tojstring()));
-			} 
-			catch (MissingPermissionsException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
-			} 
-			catch (HTTP429Exception e) 
+			}
+			catch (DiscordException | HTTP429Exception | MissingPermissionsException e)
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
-			} 
-			catch (DiscordException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
 			return LuaValue.NIL;

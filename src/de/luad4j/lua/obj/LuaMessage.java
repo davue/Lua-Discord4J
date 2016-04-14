@@ -42,106 +42,81 @@ public class LuaMessage
 		
 		// Init Lua
 		mLuaMessage = LuaValue.tableOf();
-		mLuaMessage.set("acknowledge", new acknowledge());
-		mLuaMessage.set("delete", new delete());
-		mLuaMessage.set("edit", new edit());
-		mLuaMessage.set("getAttachments", new getAttachments());
-		mLuaMessage.set("getAuthor", new getAuthor());
-		mLuaMessage.set("getChannel", new getChannel());
-		mLuaMessage.set("getContent", new getContent());
-		mLuaMessage.set("getCreationDate", new getCreationDate());
-		mLuaMessage.set("getEditedTimestamp", new getEditedTimestamp());
-		mLuaMessage.set("getGuild", new getGuild());
-		mLuaMessage.set("getID", new getID());
-		mLuaMessage.set("getMentions", new getMentions());
-		mLuaMessage.set("getTimestamp", new getTimestamp());
-		mLuaMessage.set("isAcknowledged", new isAcknowledged());
-		mLuaMessage.set("mentionsEveryone", new mentionsEveryone());
-		mLuaMessage.set("reply", new reply());
+		mLuaMessage.set("acknowledge", new Acknowledge());
+		mLuaMessage.set("delete", new Delete());
+		mLuaMessage.set("edit", new Edit());
+		mLuaMessage.set("getAttachments", new GetAttachments());
+		mLuaMessage.set("getAuthor", new GetAuthor());
+		mLuaMessage.set("getChannel", new GetChannel());
+		mLuaMessage.set("getContent", new GetContent());
+		mLuaMessage.set("getCreationDate", new GetCreationDate());
+		mLuaMessage.set("getEditedTimestamp", new GetEditedTimestamp());
+		mLuaMessage.set("getGuild", new GetGuild());
+		mLuaMessage.set("getID", new GetID());
+		mLuaMessage.set("getMentions", new GetMentions());
+		mLuaMessage.set("getTimestamp", new GetTimestamp());
+		mLuaMessage.set("isAcknowledged", new IsAcknowledged());
+		mLuaMessage.set("mentionsEveryone", new MentionsEveryone());
+		mLuaMessage.set("reply", new Reply());
 	}
 	
-	class acknowledge extends ZeroArgFunction
+	private class Acknowledge extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
 		{
-			try 
+			try
 			{
 				mMessage.acknowledge();
-			} 
-			catch (HTTP429Exception e) 
+			}
+			catch (HTTP429Exception | DiscordException e)
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
-			} 
-			catch (DiscordException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
 			return LuaValue.NIL;
 		}
 	}
 	
-	class delete extends ZeroArgFunction
+	private class Delete extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
 		{
-			try 
+			try
 			{
 				mMessage.delete();
-			} 
-			catch (MissingPermissionsException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
-			} 
-			catch (HTTP429Exception e) 
+			}
+			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
-			} 
-			catch (DiscordException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
 			return LuaValue.NIL;
 		}
 	}
 	
-	class edit extends OneArgFunction
+	private class Edit extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue content) 
 		{
-			try 
+			try
 			{
-				return (new LuaMessage(mMessage.edit(content.tojstring()))).getTable(); // Return a new message object containing the edited message
-			} 
-			catch (MissingPermissionsException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
-			} 
-			catch (HTTP429Exception e) 
+				return (new LuaMessage(mMessage.edit(content.tojstring()))).getTable();
+			}
+			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
-			} 
-			catch (DiscordException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 		}
 	}
 	
 	// TODO: needs implementation of List and IMessage.Attachment
-	class getAttachments extends ZeroArgFunction
+	private class GetAttachments extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -151,7 +126,7 @@ public class LuaMessage
 		}
 	}
 	
-	class getAuthor extends ZeroArgFunction
+	private class GetAuthor extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -161,7 +136,7 @@ public class LuaMessage
 	}
 	
 	// TODO: implement LuaChannel
-	class getChannel extends ZeroArgFunction
+	private class GetChannel extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -173,7 +148,7 @@ public class LuaMessage
 	
 	// getClient() not needed
 	
-	class getContent extends ZeroArgFunction
+	private class GetContent extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -182,7 +157,7 @@ public class LuaMessage
 		}
 	}
 	
-	class getCreationDate extends ZeroArgFunction
+	private class GetCreationDate extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -191,7 +166,7 @@ public class LuaMessage
 		}
 	}
 	
-	class getEditedTimestamp extends ZeroArgFunction
+	private class GetEditedTimestamp extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -205,7 +180,7 @@ public class LuaMessage
 	}
 	
 	// TODO: implement LuaGuild
-	class getGuild extends ZeroArgFunction
+	private class GetGuild extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -215,7 +190,7 @@ public class LuaMessage
 		}
 	}
 	
-	class getID extends ZeroArgFunction
+	private class GetID extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -225,7 +200,7 @@ public class LuaMessage
 	}
 	
 	// TODO: implement List
-	class getMentions extends ZeroArgFunction
+	private class GetMentions extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -235,7 +210,7 @@ public class LuaMessage
 		}
 	}	
 	
-	class getTimestamp extends ZeroArgFunction
+	private class GetTimestamp extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -244,7 +219,7 @@ public class LuaMessage
 		}
 	}
 
-	class isAcknowledged extends ZeroArgFunction
+	private class IsAcknowledged extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -253,7 +228,7 @@ public class LuaMessage
 		}
 	}
 	
-	class mentionsEveryone extends ZeroArgFunction
+	private class MentionsEveryone extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
@@ -262,30 +237,20 @@ public class LuaMessage
 		}
 	}
 	
-	class reply extends OneArgFunction
+	private class Reply extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue content) 
 		{
-			try 
+			try
 			{
 				mMessage.reply(content.tojstring());
 				return LuaValue.NIL;
-			} 
-			catch (MissingPermissionsException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("MissingPermissionsException:" + e.getErrorMessage());
-			} 
-			catch (HTTP429Exception e) 
+			}
+			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf("HTTP429Exception:" + e.getMessage());
-			} 
-			catch (DiscordException e) 
-			{
-				logger.error(e.getErrorMessage());
-				return LuaValue.valueOf("DiscordException:" + e.getErrorMessage());
+				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 		}
 	}

@@ -26,6 +26,8 @@ import java.util.Optional;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.ZeroArgFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
@@ -46,6 +48,8 @@ public class LuaClient
 {
 	private static IDiscordClient mClient; // Client object inside Java
 	private static LuaValue mLuaClient; // Table: Client object inside Lua
+	
+	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 
 	public LuaClient()
 	{
@@ -99,10 +103,10 @@ public class LuaClient
 				try
 				{
 					mClient.changeAvatar(Image.forFile(file));
-					return LuaValue.NIL;
 				}
 				catch (DiscordException | HTTP429Exception e)
 				{
+					logger.error(e.getMessage());
 					return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 				}
 			}
@@ -111,13 +115,15 @@ public class LuaClient
 				try
 				{
 					mClient.changeAvatar(Image.defaultAvatar());
-					return LuaValue.NIL;
 				}
 				catch (DiscordException | HTTP429Exception e)
 				{
+					logger.error(e.getMessage());
 					return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 				}
 			}
+			
+			return LuaValue.NIL;
 		}
 	}
 
@@ -129,12 +135,13 @@ public class LuaClient
 			try
 			{
 				mClient.changeEmail(email.tojstring());
-				return LuaValue.NIL;
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
+			
+			return LuaValue.NIL;
 		}
 	}
 
@@ -146,12 +153,13 @@ public class LuaClient
 			try
 			{
 				mClient.changePassword(password.tojstring());
-				return LuaValue.NIL;
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
+			
+			return LuaValue.NIL;
 		}
 	}
 
@@ -163,12 +171,13 @@ public class LuaClient
 			try
 			{
 				mClient.changeUsername(username.tojstring());
-				return LuaValue.NIL;
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
+			
+			return LuaValue.NIL;
 		}
 	}
 
@@ -183,12 +192,13 @@ public class LuaClient
 				File file = new File(args.tojstring(1));
 				IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)), Optional.ofNullable(Image.forFile(file)));
 				//return new LuaGuild(guild).getTable();
-				return LuaValue.NIL;
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
+			
+			return LuaValue.NIL;
 		}
 	}
 
