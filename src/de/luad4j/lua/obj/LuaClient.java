@@ -92,7 +92,7 @@ public class LuaClient
 		}
 	}
 
-	static class ChangeAvatar extends OneArgFunction
+	private static class ChangeAvatar extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue filepath)
@@ -127,7 +127,7 @@ public class LuaClient
 		}
 	}
 
-	static class ChangeEmail extends OneArgFunction
+	private static class ChangeEmail extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue email)
@@ -138,6 +138,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
@@ -145,7 +146,7 @@ public class LuaClient
 		}
 	}
 
-	static class ChangePassword extends OneArgFunction
+	private static class ChangePassword extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue password)
@@ -156,6 +157,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
@@ -163,7 +165,7 @@ public class LuaClient
 		}
 	}
 
-	static class ChangeUsername extends OneArgFunction
+	private static class ChangeUsername extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue username)
@@ -174,6 +176,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
@@ -182,7 +185,7 @@ public class LuaClient
 	}
 
 	// TODO: implement LuaGuild
-	static class CreateGuild extends VarArgFunction
+	private static class CreateGuild extends VarArgFunction
 	{
 		@Override
 		public LuaValue invoke(Varargs args)
@@ -195,6 +198,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 			
@@ -203,7 +207,7 @@ public class LuaClient
 	}
 
 	// TODO: implement LuaChannel
-	static class GetChannelByID extends OneArgFunction
+	private static class GetChannelByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue channelID)
@@ -214,7 +218,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaChannel
-	static class GetChannels extends OneArgFunction
+	private static class GetChannels extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue includePrivate)
@@ -232,7 +236,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaVoiceChannel
-	static class GetConnectedVoiceChannels extends ZeroArgFunction
+	private static class GetConnectedVoiceChannels extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -249,7 +253,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaGuild
-	static class GetGuildByID extends OneArgFunction
+	private static class GetGuildByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue guildID)
@@ -260,7 +264,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaGuild
-	static class GetGuilds extends ZeroArgFunction
+	private static class GetGuilds extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -277,7 +281,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaInvite
-	static class GetInviteForCode extends OneArgFunction
+	private static class GetInviteForCode extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue code)
@@ -287,7 +291,7 @@ public class LuaClient
 		}
 	}
 	
-	static class GetLaunchTime extends ZeroArgFunction
+	private static class GetLaunchTime extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -297,7 +301,7 @@ public class LuaClient
 	}
 
 	// TODO: implement LuaPrivateChannel
-	static class GetOrCreatePMChannel extends OneArgFunction
+	private static class GetOrCreatePMChannel extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue userID)
@@ -307,7 +311,7 @@ public class LuaClient
 		}
 	}
 	
-	static class GetOurUser extends ZeroArgFunction
+	private static class GetOurUser extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -317,7 +321,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaRegion
-	static class GetRegionByID extends OneArgFunction
+	private static class GetRegionByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue regionID)
@@ -328,7 +332,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaRegion
-	static class GetRegions extends ZeroArgFunction
+	private static class GetRegions extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -346,6 +350,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}*/
 			
@@ -353,7 +358,7 @@ public class LuaClient
 		}
 	}
 	
-	static class GetResponseTime extends ZeroArgFunction
+	private static class GetResponseTime extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -362,7 +367,7 @@ public class LuaClient
 		}
 	}
 	
-	static class GetToken extends ZeroArgFunction
+	private static class GetToken extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -371,7 +376,7 @@ public class LuaClient
 		}
 	}
 	
-	static class GetUserByID extends OneArgFunction
+	private static class GetUserByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue userID)
@@ -381,7 +386,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaVoiceChannel
-	static class GetVoiceChannelByID extends OneArgFunction
+	private static class GetVoiceChannelByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue channelID)
@@ -392,7 +397,7 @@ public class LuaClient
 	}
 	
 	// TODO: implement LuaVoiceChannel
-	static class GetVoiceChannels extends ZeroArgFunction
+	private static class GetVoiceChannels extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -409,7 +414,7 @@ public class LuaClient
 		}
 	}
 	
-	static class IsBot extends ZeroArgFunction
+	private static class IsBot extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -418,7 +423,7 @@ public class LuaClient
 		}
 	}
 	
-	static class IsReady extends ZeroArgFunction
+	private static class IsReady extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -427,7 +432,7 @@ public class LuaClient
 		}
 	}
 	
-	static class Login extends ZeroArgFunction
+	private static class Login extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -439,12 +444,13 @@ public class LuaClient
 			}
 			catch (DiscordException e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 		}
 	}
 	
-	static class Logout extends ZeroArgFunction
+	private static class Logout extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -456,12 +462,13 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
+				logger.error(e.getMessage());
 				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
 			}
 		}
 	}
 	
-	static class UpdatePresence extends TwoArgFunction
+	private static class UpdatePresence extends TwoArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue isIdle, LuaValue game)
