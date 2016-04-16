@@ -44,7 +44,7 @@ public class Main
 		if(args.length >= 4)
 		{			
 			Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-			root.setLevel(Level.ERROR);
+			root.setLevel(Level.INFO);
 			
 			if(args[0].equals("-user"))
 			{

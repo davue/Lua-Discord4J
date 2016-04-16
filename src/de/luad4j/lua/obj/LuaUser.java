@@ -18,6 +18,9 @@
 
 package de.luad4j.lua.obj;
 
+import java.util.List;
+
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -25,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.luad4j.Main;
+import de.luad4j.events.JavaErrorEvent;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
@@ -137,13 +142,27 @@ public class LuaUser
 		}
 	}
 	
-	// TODO: somehow implement a list in lua
+	// TODO: implement LuaRole
 	private class GetRolesForGuildID extends OneArgFunction
 	{
 		@Override
-		public LuaValue call(LuaValue guildid) 
+		public LuaValue call(LuaValue guildID) 
 		{
-			//return LuaValue.valueOf(mUser.getPresence());
+			try
+			{
+				List<IRole> roles = mUser.getRolesForGuild(Main.mDiscordClient.getGuildByID(guildID.tojstring()));
+				LuaValue luaRoles = LuaValue.tableOf();
+				for(IRole role : roles)
+				{
+					//luaRoles.set(luaRoles.length()+1, (new LuaRole(role)));
+				}
+			}
+			catch(LuaError e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
 			return LuaValue.NIL;
 		}
 	}
@@ -193,7 +212,7 @@ public class LuaUser
 			catch (DiscordException | HTTP429Exception | MissingPermissionsException e)
 			{
 				logger.error(e.getMessage());
-				return LuaValue.valueOf(e.getClass().getSimpleName() + ":" + e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
 			return LuaValue.NIL;

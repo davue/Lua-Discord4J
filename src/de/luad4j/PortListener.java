@@ -24,11 +24,17 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.luad4j.events.PortDataEvent;
+import de.luad4j.lua.obj.LuaMessage;
 
 public class PortListener extends Thread
 {
 	private final int mPort;
+	
+	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 	
 	public PortListener(int port)
 	{
@@ -62,7 +68,7 @@ public class PortListener extends Thread
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 	}
 }
