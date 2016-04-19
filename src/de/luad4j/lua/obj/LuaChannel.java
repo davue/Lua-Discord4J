@@ -3,7 +3,6 @@ package de.luad4j.lua.obj;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 
 import org.luaj.vm2.LuaError;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import de.luad4j.Main;
 import de.luad4j.events.JavaErrorEvent;
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IInvite;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
@@ -127,13 +125,12 @@ public class LuaChannel
 		}
 	}
 	
-	// TODO: implement LuaInvite
 	private class CreateInvite extends VarArgFunction
 	{
 		@Override
 		public LuaValue invoke(Varargs args)
 		{
-			/*try
+			try
 			{
 				return (new LuaInvite(mChannel.createInvite(args.toint(1), args.toint(2), args.toboolean(3), args.toboolean(4)))).getTable();
 			}
@@ -141,7 +138,7 @@ public class LuaChannel
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 					
 			return LuaValue.NIL;
 		}

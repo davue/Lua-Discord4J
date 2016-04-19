@@ -131,14 +131,12 @@ public class LuaUser
 		}
 	}
 	
-	// TODO: implement LuaPresence object
 	private class GetPresence extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
 		{
-			//return (new LuaPresence(mMain.getPresence())).getTable();
-			return LuaValue.NIL;
+			return LuaValue.valueOf(mUser.getPresence().name());
 		}
 	}
 	

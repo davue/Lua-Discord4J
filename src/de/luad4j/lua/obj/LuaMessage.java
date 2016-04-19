@@ -135,7 +135,7 @@ public class LuaMessage
 				
 				for (IMessage.Attachment attachment : messageAttachments)
 				{
-					luaMessageAttachments.set(luaMessageAttachments.length()+1, (new Attachment(attachment)).getTable());
+					luaMessageAttachments.set(luaMessageAttachments.length()+1, (new LuaAttachment(attachment)).getTable());
 				}
 				
 				return luaMessageAttachments;
@@ -290,12 +290,12 @@ public class LuaMessage
 		}
 	}
 	
-	private class Attachment
+	private class LuaAttachment
 	{
 		private IMessage.Attachment mMessageAttachment;
 		private LuaValue			mLuaMessageAttachment;
 		
-		public Attachment(IMessage.Attachment messageAttachment)
+		public LuaAttachment(IMessage.Attachment messageAttachment)
 		{
 			mMessageAttachment = messageAttachment;
 			

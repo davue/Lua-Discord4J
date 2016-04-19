@@ -465,13 +465,12 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaInvite
 	private class GetInvites extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			/*try
+			try
 			{
 				List<IInvite> invites = mGuild.getInvites();
 				LuaValue luaInvites = LuaValue.tableOf();
@@ -486,7 +485,7 @@ public class LuaGuild
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 			
 			return LuaValue.NIL;
 		}

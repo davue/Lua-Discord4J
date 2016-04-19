@@ -294,14 +294,12 @@ public class LuaClient
 		}
 	}
 	
-	// TODO: implement LuaInvite
 	private static class GetInviteForCode extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue code)
 		{
-			//return (new LuaInvite(mClient.getInviteForCode(code.tojstring()))).getTable();
-			return LuaValue.NIL;
+			return (new LuaInvite(mClient.getInviteForCode(code.tojstring()))).getTable();
 		}
 	}
 	
