@@ -516,14 +516,12 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaRegion
 	private class GetRegion extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			//return (new LuaRegion(mGuild.getRegion())).getTable();
-			return LuaValue.NIL;
+			return (new LuaRegion(mGuild.getRegion())).getTable();
 		}
 	}
 	

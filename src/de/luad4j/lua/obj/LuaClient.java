@@ -339,31 +339,28 @@ public class LuaClient
 		}
 	}
 	
-	// TODO: implement LuaRegion
 	private static class GetRegionByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue regionID)
 		{
-			//return (new LuaRegion(mClient.getRegionByID(regionID.tojstring()))).getTable();
-			return LuaValue.NIL;
+			return (new LuaRegion(mClient.getRegionByID(regionID.tojstring()))).getTable();
 		}
 	}
 	
-	// TODO: implement LuaRegion
 	private static class GetRegions extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			/*try
+			try
 			{
 				List<IRegion> regions = mClient.getRegions();
 				
 				LuaValue luaRegions = LuaValue.tableOf();
 				for(IRegion region : regions)
 				{
-					luaRegions.set(luaRegions.length(), new LuaRegion(region));
+					luaRegions.set(luaRegions.length(), (new LuaRegion(region)).getTable());
 				}
 				return luaRegions;
 			}
@@ -371,7 +368,7 @@ public class LuaClient
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 			
 			return LuaValue.NIL;
 		}
