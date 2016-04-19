@@ -1,6 +1,8 @@
 package de.luad4j.lua.obj;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
@@ -15,6 +17,7 @@ import de.luad4j.Main;
 import de.luad4j.events.JavaErrorEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IInvite;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MissingPermissionsException;
@@ -229,6 +232,206 @@ public class LuaChannel
 		}
 	}
 	
+	private class GetModifiedRolePermissions extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue roleID)
+		{
+			try
+			{
+				EnumSet<Permissions> permissions = mChannel.getModifiedPermissions(mChannel.getGuild().getRoleByID(roleID.tojstring()));
+				LuaValue luaPermissions = LuaValue.tableOf();
+				
+				for (Permissions permission : permissions)
+				{
+					luaPermissions.set(luaPermissions.length()+1, permission.name());
+				}
+				
+				return luaPermissions;
+			}
+			catch (LuaError e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetModifiedUserPermissions extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID)
+		{
+			try
+			{
+				EnumSet<Permissions> permissions = mChannel.getModifiedPermissions(Main.mDiscordClient.getUserByID(userID.tojstring()));
+				LuaValue luaPermissions = LuaValue.tableOf();
+				
+				for (Permissions permission : permissions)
+				{
+					luaPermissions.set(luaPermissions.length()+1, permission.name());
+				}
+				
+				return luaPermissions;
+			}
+			catch (LuaError e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetName extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mChannel.getName());
+		}
+	}
+	
+	private class GetPosition extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mChannel.getPosition());
+		}
+	}
+	
+	private class GetRoleOverrides extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			try
+			{
+				Map<String,IChannel.PermissionOverride> permissionOverrides = mChannel.getRoleOverrides();
+				LuaValue luaPermissionOverrides = LuaValue.tableOf();
+				
+				for(Map.Entry<String,IChannel.PermissionOverride> permissionOverride : permissionOverrides.entrySet())
+				{
+					luaPermissionOverrides.set(permissionOverride.getKey(), (new LuaPermissionOverride(permissionOverride.getValue())).getTable());
+				}
+				
+				return luaPermissionOverrides;
+			}
+			catch (LuaError e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class GetUserOverrides extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			try
+			{
+				Map<String,IChannel.PermissionOverride> permissionOverrides = mChannel.getUserOverrides();
+				LuaValue luaPermissionOverrides = LuaValue.tableOf();
+				
+				for(Map.Entry<String,IChannel.PermissionOverride> permissionOverride : permissionOverrides.entrySet())
+				{
+					luaPermissionOverrides.set(permissionOverride.getKey(), (new LuaPermissionOverride(permissionOverride.getValue())).getTable());
+				}
+				
+				return luaPermissionOverrides;
+			}
+			catch (LuaError e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class LuaPermissionOverride
+	{
+		private IChannel.PermissionOverride mPermissionOverride;
+		private LuaValue					mLuaPermissionOverride;
+		
+		public LuaPermissionOverride(IChannel.PermissionOverride permOverride)
+		{
+			mPermissionOverride = permOverride;
+			
+			mLuaPermissionOverride = LuaValue.tableOf();
+			mLuaPermissionOverride.set("allow", new Allow());
+			mLuaPermissionOverride.set("deny", new Deny());
+		}
+		
+		public class Allow extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				try
+				{
+					EnumSet<Permissions> permissions = mPermissionOverride.allow();
+					LuaValue luaPermissions = LuaValue.tableOf();
+					
+					for (Permissions permission : permissions)
+					{
+						luaPermissions.set(luaPermissions.length()+1, permission.name());
+					}
+					
+					return luaPermissions;
+				}
+				catch (LuaError e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}
+		}
+		
+		public class Deny extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				try
+				{
+					EnumSet<Permissions> permissions = mPermissionOverride.deny();
+					LuaValue luaPermissions = LuaValue.tableOf();
+					
+					for (Permissions permission : permissions)
+					{
+						luaPermissions.set(luaPermissions.length()+1, permission.name());
+					}
+					
+					return luaPermissions;
+				}
+				catch (LuaError e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}
+		}
+		
+		public LuaValue getTable()
+		{
+			return mLuaPermissionOverride;
+		}
+	}
+
 	public LuaValue getTable()
 	{
 		return mLuaChannel;
