@@ -1,5 +1,7 @@
 package de.luad4j.lua.obj;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.slf4j.Logger;
@@ -46,6 +49,25 @@ public class LuaChannel
 		mLuaChannel.set("getInvites", new GetInvites());
 		mLuaChannel.set("getLastReadMessage", new GetLastReadMessage());
 		mLuaChannel.set("getLastReadMessageID", new GetLastReadMessageID());
+		mLuaChannel.set("getMessageByID", new GetMessageByID());
+		mLuaChannel.set("getMessages", new GetMessages());
+		mLuaChannel.set("getModifiedRolePermissions", new GetModifiedRolePermissions());
+		mLuaChannel.set("getModifiedUserPermissions", new GetModifiedUserPermissions());
+		mLuaChannel.set("getName", new GetName());
+		mLuaChannel.set("getPosition", new GetPosition());
+		mLuaChannel.set("getRoleOverrides", new GetRoleOverrides());
+		mLuaChannel.set("getTopic", new GetTopic());
+		mLuaChannel.set("getTypingStatus", new GetTypingStatus());
+		mLuaChannel.set("getUserOverrides", new GetUserOverrides());
+		mLuaChannel.set("isPrivate", new IsPrivate());
+		mLuaChannel.set("mention", new Mention());
+		mLuaChannel.set("overrideRolePermissions", new OverrideRolePermissions());
+		mLuaChannel.set("overrideUserPermissions", new OverrideUserPermissions());
+		mLuaChannel.set("removeRolePermissionsOverride", new RemoveRolePermissionsOverride());
+		mLuaChannel.set("removeUserPermissionsOverride", new RemoveUserPermissionsOverride());
+		mLuaChannel.set("sendFile", new SendFile());
+		mLuaChannel.set("sendMessage", new SendMessage());
+		mLuaChannel.set("toggleTypingStatus", new ToggleTypingStatus());
 	}
 	
 	private class ChangeName extends OneArgFunction
@@ -222,13 +244,12 @@ public class LuaChannel
 		}
 	}
 	
-	// TODO: implement MessageList
 	private class GetMessages extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.NIL;
+			return (new LuaMessageList(mChannel.getMessages())).getTable();
 		}
 	}
 	
@@ -331,6 +352,24 @@ public class LuaChannel
 		}
 	}
 	
+	private class GetTopic extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mChannel.getTopic());
+		}
+	}
+	
+	private class GetTypingStatus extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mChannel.getTypingStatus());
+		}
+	}
+	
 	private class GetUserOverrides extends ZeroArgFunction
 	{
 		@Override
@@ -354,6 +393,212 @@ public class LuaChannel
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class IsPrivate extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mChannel.isPrivate());
+		}
+	}
+	
+	private class Mention extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mChannel.mention());
+		}
+	}
+	
+	private class OverrideRolePermissions extends ThreeArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue roleID, LuaValue toAddTable, LuaValue toRemoveTable)
+		{
+			try
+			{
+				// Parse permissions from lua to java
+				LuaValue k = LuaValue.NIL;
+				
+				EnumSet<Permissions> toAdd = EnumSet.noneOf(Permissions.class);
+				while ( true ) 
+				{
+					Varargs n = toAddTable.next(k);
+					if ( (k = n.arg1()).isnil() )
+						break;
+					LuaValue v = n.arg(2);
+					toAdd.add(Permissions.valueOf(v.tojstring()));
+				}
+				
+				k = LuaValue.NIL;
+				EnumSet<Permissions> toRemove = EnumSet.noneOf(Permissions.class);
+				while ( true ) 
+				{
+					Varargs n = toRemoveTable.next(k);
+					if ( (k = n.arg1()).isnil() )
+						break;
+					LuaValue v = n.arg(2);
+					toRemove.add(Permissions.valueOf(v.tojstring()));
+				}
+				
+				mChannel.overrideRolePermissions(mChannel.getGuild().getRoleByID(roleID.tojstring()), toAdd, toRemove);
+			}
+			catch (NullPointerException | IllegalArgumentException | LuaError | MissingPermissionsException | HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class OverrideUserPermissions extends ThreeArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID, LuaValue toAddTable, LuaValue toRemoveTable)
+		{
+			try
+			{
+				// Parse permissions from lua to java
+				LuaValue k = LuaValue.NIL;
+				
+				EnumSet<Permissions> toAdd = EnumSet.noneOf(Permissions.class);
+				while ( true ) 
+				{
+					Varargs n = toAddTable.next(k);
+					if ( (k = n.arg1()).isnil() )
+						break;
+					LuaValue v = n.arg(2);
+					toAdd.add(Permissions.valueOf(v.tojstring()));
+				}
+				
+				k = LuaValue.NIL;
+				EnumSet<Permissions> toRemove = EnumSet.noneOf(Permissions.class);
+				while ( true ) 
+				{
+					Varargs n = toRemoveTable.next(k);
+					if ( (k = n.arg1()).isnil() )
+						break;
+					LuaValue v = n.arg(2);
+					toRemove.add(Permissions.valueOf(v.tojstring()));
+				}
+				
+				mChannel.overrideUserPermissions(Main.mDiscordClient.getUserByID(userID.tojstring()), toAdd, toRemove);
+			}
+			catch (NullPointerException | IllegalArgumentException | LuaError | MissingPermissionsException | HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class RemoveRolePermissionsOverride extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue roleID)
+		{
+			try
+			{
+				mChannel.removePermissionsOverride(mChannel.getGuild().getRoleByID(roleID.tojstring()));
+			}
+			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class RemoveUserPermissionsOverride extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID)
+		{
+			try
+			{
+				mChannel.removePermissionsOverride(Main.mDiscordClient.getUserByID(userID.tojstring()));
+			}
+			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class SendFile extends VarArgFunction
+	{
+		@Override
+		public LuaValue invoke(Varargs args)
+		{
+			try
+			{
+				File file = new File(args.tojstring(1));
+				
+				if (args.narg() == 1)
+				{
+					mChannel.sendFile(file);
+				}
+				else if(args.narg() > 1)
+				{
+					mChannel.sendFile(file, args.tojstring(2));
+				}
+			}
+			catch (NullPointerException | IOException | MissingPermissionsException | HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class SendMessage extends VarArgFunction
+	{
+		@Override
+		public LuaValue invoke(Varargs args)
+		{
+			try
+			{
+				if (args.narg() == 1)
+				{
+					mChannel.sendMessage(args.tojstring(1));
+				}
+				else if(args.narg() > 1)
+				{
+					mChannel.sendMessage(args.tojstring(1), args.toboolean(2));
+				}
+			}
+			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+
+			return LuaValue.NIL;
+		}
+	}
+	
+	private class ToggleTypingStatus extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			mChannel.toggleTypingStatus();
 			return LuaValue.NIL;
 		}
 	}
