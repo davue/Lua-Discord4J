@@ -237,21 +237,20 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaRole
 	private class CreateRole extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			/*try
+			try
 			{
-				return new LuaRole(mGuild.createRole());
+				return (new LuaRole(mGuild.createRole())).getTable();
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 
 			return LuaValue.NIL;
 		}
@@ -430,14 +429,12 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaRole
 	private class GetEveryoneRole extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			//return (new LuaRole(mGuild.getEveryoneRole())).getTable();
-			return LuaValue.NIL;
+			return (new LuaRole(mGuild.getEveryoneRole())).getTable();
 		}
 	}
 	
@@ -533,18 +530,15 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaRole
 	private class GetRoleByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue roleID)
 		{
-			//return (new LuaRole(mGuild.getRoleByID(roleID.tojstring()))).getTable();
-			return LuaValue.NIL;
+			return (new LuaRole(mGuild.getRoleByID(roleID.tojstring()))).getTable();
 		}
 	}
 	
-	// TODO: implement LuaRole
 	private class GetRoles extends ZeroArgFunction
 	{
 		@Override
@@ -552,14 +546,14 @@ public class LuaGuild
 		{
 			try
 			{
-				/*List<IRole> roles = mGuild.getRoles();
+				List<IRole> roles = mGuild.getRoles();
 				LuaValue luaRoles = LuaValue.tableOf();
 				for(IRole role : roles)
 				{
 					luaRoles.set(luaRoles.length()+1, (new LuaRole(role)).getTable());
 				}
 				
-				return luaRoles;*/
+				return luaRoles;
 			}
 			catch(LuaError e)
 			{

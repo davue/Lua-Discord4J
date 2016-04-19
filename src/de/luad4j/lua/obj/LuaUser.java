@@ -142,7 +142,6 @@ public class LuaUser
 		}
 	}
 	
-	// TODO: implement LuaRole
 	private class GetRolesForGuildID extends OneArgFunction
 	{
 		@Override
@@ -154,7 +153,7 @@ public class LuaUser
 				LuaValue luaRoles = LuaValue.tableOf();
 				for(IRole role : roles)
 				{
-					//luaRoles.set(luaRoles.length()+1, (new LuaRole(role)));
+					luaRoles.set(luaRoles.length()+1, (new LuaRole(role)).getTable());
 				}
 			}
 			catch(LuaError e)
