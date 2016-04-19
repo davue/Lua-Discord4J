@@ -7,8 +7,8 @@ import sx.blah.discord.util.MessageList;
 
 public class LuaMessageList
 {
-	private MessageList mMessageList;
-	private LuaValue	mLuaMessageList;
+	private MessageList 	mMessageList;
+	private LuaValue		mLuaMessageList;
 	
 	public LuaMessageList(MessageList messageList)
 	{

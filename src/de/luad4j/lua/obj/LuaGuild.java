@@ -256,21 +256,20 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel
 	private class CreateVoiceChannel extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			/*try
+			try
 			{
-				return new LuaVoiceChannel(mGuild.createVoiceChannel(name.tojstring()));
+				return (new LuaVoiceChannel(mGuild.createVoiceChannel(name.tojstring()))).getTable();
 			}
 			catch (DiscordException | MissingPermissionsException | HTTP429Exception e)
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 			
 			return LuaValue.NIL;
 		}
@@ -618,24 +617,21 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel
 	private class GetVoiceChannelByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			//return (new LuaVoiceChannel(mGuild.getVoiceChannelByID(channelID.tojstring()))).getTable();
-			return LuaValue.NIL;
+			return (new LuaVoiceChannel(mGuild.getVoiceChannelByID(channelID.tojstring()))).getTable();
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel
 	private class GetVoiceChannels extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			/*try
+			try
 			{
 				List<IVoiceChannel> channels = mGuild.getVoiceChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
@@ -650,7 +646,7 @@ public class LuaGuild
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 			
 			return LuaValue.NIL;
 		}

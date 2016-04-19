@@ -234,7 +234,6 @@ public class LuaClient
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel
 	private static class GetConnectedVoiceChannels extends ZeroArgFunction
 	{
 		@Override
@@ -242,13 +241,13 @@ public class LuaClient
 		{
 			try
 			{
-				/*List<IVoiceChannel> channels = mClient.getConnectedVoiceChannels();
+				List<IVoiceChannel> channels = mClient.getConnectedVoiceChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IChannel channel : channels)
+				for(IVoiceChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, new LuaVoiceChannel(channel));
+					luaChannels.set(luaChannels.length()+1, (new LuaVoiceChannel(channel)).getTable());
 				}
-				return luaChannels;*/
+				return luaChannels;
 			}
 			catch(LuaError e)
 			{
@@ -397,18 +396,15 @@ public class LuaClient
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel
 	private static class GetVoiceChannelByID extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			//return (new LuaVoiceChannel(mClient.getVoiceChannelByID(channelID.tojstring()))).getTable();
-			return LuaValue.NIL;
+			return (new LuaVoiceChannel(mClient.getVoiceChannelByID(channelID.tojstring()))).getTable();
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel
 	private static class GetVoiceChannels extends ZeroArgFunction
 	{
 		@Override
@@ -416,13 +412,13 @@ public class LuaClient
 		{
 			try
 			{
-				/*Collection<IVoiceChannel> channels = mClient.getVoiceChannels();
+				Collection<IVoiceChannel> channels = mClient.getVoiceChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IChannel channel : channels)
+				for(IVoiceChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, new LuaVoiceChannel(channel));
+					luaChannels.set(luaChannels.length()+1, (new LuaVoiceChannel(channel)).getTable());
 				}
-				return luaChannels;*/
+				return luaChannels;
 			}
 			catch(LuaError e)
 			{

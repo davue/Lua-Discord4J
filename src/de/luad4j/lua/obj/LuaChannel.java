@@ -25,10 +25,10 @@ import sx.blah.discord.util.MissingPermissionsException;
 
 public class LuaChannel
 {
-	private IChannel mChannel;
-	private LuaValue mLuaChannel;
+	protected IChannel mChannel;
+	protected LuaValue mLuaChannel;
 	
-	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	protected static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 	
 	public LuaChannel(IChannel channel)
 	{

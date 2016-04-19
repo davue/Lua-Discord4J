@@ -164,7 +164,6 @@ public class LuaUser
 		}
 	}
 	
-	// TODO: implement LuaVoiceChannel object
 	private class GetVoiceChannel extends ZeroArgFunction
 	{
 		@Override
@@ -172,9 +171,9 @@ public class LuaUser
 		{
 			if(mUser.getVoiceChannel().isPresent())
 			{
-				//return (new LuaVoiceChannel(mUser.getVoiceChannel().get())).getTable();
-				return LuaValue.NIL;
+				return (new LuaVoiceChannel(mUser.getVoiceChannel().get())).getTable();
 			}
+			
 			return LuaValue.NIL;
 		}
 	}
