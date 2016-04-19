@@ -337,13 +337,12 @@ public class LuaGuild
 		}
 	}
 	
-	// TODO: implement LuaAudioChannel
 	private class GetAudioChannel extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
-			/*try
+			try
 			{
 				return (new LuaAudioChannel(mGuild.getAudioChannel())).getTable();
 			}
@@ -351,7 +350,7 @@ public class LuaGuild
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}*/
+			}
 			
 			return LuaValue.NIL;
 		}

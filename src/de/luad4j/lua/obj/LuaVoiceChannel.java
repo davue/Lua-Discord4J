@@ -23,7 +23,6 @@ public class LuaVoiceChannel extends LuaChannel
 		super.mLuaChannel.set("leave", new Leave());
 	}
 	
-	// TODO: implement LuaAudioChannel
 	private class GetAudioChannel extends ZeroArgFunction
 	{
 		@Override
@@ -31,7 +30,7 @@ public class LuaVoiceChannel extends LuaChannel
 		{
 			try
 			{
-				//return (new LuaAudioChannel(mVoiceChannel.getAudioChannel())).getTable();
+				return (new LuaAudioChannel(mVoiceChannel.getAudioChannel())).getTable();
 			}
 			catch (Exception e)
 			{

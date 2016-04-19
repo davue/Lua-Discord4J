@@ -48,8 +48,8 @@ import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class LuaClient
 {
-	private static IDiscordClient mClient; // Client object inside Java
-	private static LuaValue mLuaClient; // Table: Client object inside Lua
+	private static IDiscordClient 	mClient; 	// Client object inside Java
+	private static LuaValue 		mLuaClient; // Table: Client object inside Lua
 	
 	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 
