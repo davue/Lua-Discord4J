@@ -25,8 +25,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import de.luad4j.lua.func.*;
-import de.luad4j.lua.func.audio.*;
+import de.luad4j.lua.obj.LuaClient;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
@@ -127,30 +126,6 @@ public class Main
 	
 	private static void registerLuaFunctions()
 	{
-		// luafunc functions
-		mLuaEnv.set("deleteMessage", new DeleteMessage());
-		mLuaEnv.set("getChannels", new GetChannels());
-		mLuaEnv.set("getGuilds", new GetGuilds());
-		mLuaEnv.set("getRoles", new GetRoles());
-		mLuaEnv.set("sendMessage", new SendMessage());
-		mLuaEnv.set("setGame", new SetGame());
-		mLuaEnv.set("setTimer", new SetTimer());
-		mLuaEnv.set("updateMessage", new UpdateMessage());
-
-		// luafunc.audio functions
-		mLuaEnv.set("clearQueue", new ClearQueue());
-		mLuaEnv.set("getConnectedUsers", new GetConnectedUsers());
-		mLuaEnv.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
-		mLuaEnv.set("getQueueSize", new GetQueueSize());
-		mLuaEnv.set("getVoiceChannels", new GetVoiceChannels());
-		mLuaEnv.set("isConnectedToVoice", new IsConnectedToVoiceChannel());
-		mLuaEnv.set("joinVoiceChannel", new JoinVoiceChannel());
-		mLuaEnv.set("leaveVoiceChannel", new LeaveVoiceChannel());
-		mLuaEnv.set("pauseAudio", new PauseAudio());
-		mLuaEnv.set("queueFile", new QueueFile());
-		mLuaEnv.set("queueURL", new QueueURL());
-		mLuaEnv.set("resumeAudio", new ResumeAudio());
-		mLuaEnv.set("setAudioVolume", new SetAudioVolume());
-		mLuaEnv.set("skipAudio", new SkipAudio());
+		mLuaEnv.set("discordClient", LuaClient.getTable());
 	}
 }

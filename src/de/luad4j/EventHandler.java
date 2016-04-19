@@ -23,7 +23,7 @@ import org.luaj.vm2.LuaError;
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.*;
 import de.luad4j.events.*;
-import sx.blah.discord.handle.obj.IMessage;
+import de.luad4j.lua.obj.LuaMessage;
 
 import org.luaj.vm2.LuaValue;
 import org.slf4j.Logger;
@@ -32,37 +32,6 @@ import org.slf4j.LoggerFactory;
 public class EventHandler 
 {
 	private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
-	
-	// Helper functions
-	public LuaValue buildDefaultMsgTable(IMessage msg)
-	{
-		LuaValue author = LuaValue.tableOf();
-		author.set("id", msg.getAuthor().getID());
-		author.set("name", msg.getAuthor().getName());
-		
-		LuaValue channel = LuaValue.tableOf();
-		channel.set("id", msg.getChannel().getID());
-		channel.set("name", msg.getChannel().getName());
-		
-		LuaValue guild = LuaValue.tableOf();
-		if(!msg.getChannel().isPrivate())
-		{
-			guild.set("id", msg.getGuild().getID());
-			guild.set("name", msg.getGuild().getName());
-		}
-		
-		LuaValue message = LuaValue.tableOf();
-		message.set("author", author);
-		message.set("channel", channel);
-		message.set("text", msg.getContent());
-		message.set("id", msg.getID());
-		if(!msg.getChannel().isPrivate())
-		{
-			message.set("guild", guild);
-		}
-		
-		return message;
-	}
 	
 	// Custom Events
 	@EventSubscriber
@@ -98,6 +67,7 @@ public class EventHandler
 	public void onDiscordDisconnected(DiscordDisconnectedEvent event) // If connection is lost
 	{
 		String MethodName = "onDiscordDisconnected";
+		
 		try
 		{
 			if(Main.mLuaEnv.get(MethodName).isfunction())
@@ -120,11 +90,9 @@ public class EventHandler
 		
 		try 
 		{
-			LuaValue message = buildDefaultMsgTable(event.getMessage());
-			
 			if(Main.mLuaEnv.get(MethodName).isfunction())
 			{
-				Main.mLuaEnv.get(MethodName).call(message);
+				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getMessage()).getTable());
 			}
 		} 
 		catch(LuaError e) 
@@ -147,11 +115,9 @@ public class EventHandler
 		
 		try
 		{
-			LuaValue message = buildDefaultMsgTable(event.getMessage());
-			
 			if(Main.mLuaEnv.get(MethodName).isfunction())
 			{
-				Main.mLuaEnv.get(MethodName).call(message);
+				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getMessage()).getTable());
 			}
 		} 
 		catch(LuaError e) 
@@ -168,12 +134,13 @@ public class EventHandler
 		
 		try
 		{
-			LuaValue message = buildDefaultMsgTable(event.getNewMessage());
-			message.set("oldtext", event.getOldMessage().getContent());
-			
 			if(Main.mLuaEnv.get(MethodName).isfunction())
 			{
-				Main.mLuaEnv.get(MethodName).call(message);
+				LuaValue messages = LuaValue.tableOf();
+				messages.set("old", new LuaMessage(event.getOldMessage()).getTable());
+				messages.set("new", new LuaMessage(event.getNewMessage()).getTable());
+				
+				Main.mLuaEnv.get(MethodName).call(messages);
 			}
 		} 
 		catch(LuaError e) 
@@ -190,11 +157,9 @@ public class EventHandler
 		
 		try
 		{
-			LuaValue message = buildDefaultMsgTable(event.getAcknowledgedMessage());
-			
 			if(Main.mLuaEnv.get(MethodName).isfunction())
 			{
-				Main.mLuaEnv.get(MethodName).call(message);
+				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getAcknowledgedMessage()).getTable());
 			}
 		} 
 		catch(LuaError e) 
@@ -211,11 +176,9 @@ public class EventHandler
 		
 		try
 		{
-			LuaValue message = buildDefaultMsgTable(event.getMessage());
-			
 			if(Main.mLuaEnv.get(MethodName).isfunction())
 			{
-				Main.mLuaEnv.get(MethodName).call(message);
+				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getMessage()).getTable());
 			}
 		} 
 		catch(LuaError e) 
