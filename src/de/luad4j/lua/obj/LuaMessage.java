@@ -123,12 +123,28 @@ public class LuaMessage
 		}
 	}
 	
-	// TODO: needs implementation of List and IMessage.Attachment
 	private class GetAttachments extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
 		{
+			try
+			{
+				List<IMessage.Attachment> messageAttachments = mMessage.getAttachments();
+				LuaValue luaMessageAttachments = LuaValue.tableOf();
+				
+				for (IMessage.Attachment attachment : messageAttachments)
+				{
+					luaMessageAttachments.set(luaMessageAttachments.length()+1, (new Attachment(attachment)).getTable());
+				}
+				
+				return luaMessageAttachments;
+			}
+			catch (LuaError e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
 			
 			return LuaValue.NIL;
 		}
@@ -142,15 +158,13 @@ public class LuaMessage
 			return (new LuaUser(mMessage.getAuthor())).getTable();
 		}
 	}
-	
-	// TODO: implement LuaChannel
+
 	private class GetChannel extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call() 
 		{
-			//return (new LuaChannel(mMessage.getChannel())).getTable();
-			return LuaValue.NIL;
+			return (new LuaChannel(mMessage.getChannel())).getTable();
 		}
 	}
 	
@@ -273,6 +287,65 @@ public class LuaMessage
 			}
 			
 			return LuaValue.NIL;
+		}
+	}
+	
+	private class Attachment
+	{
+		private IMessage.Attachment mMessageAttachment;
+		private LuaValue			mLuaMessageAttachment;
+		
+		public Attachment(IMessage.Attachment messageAttachment)
+		{
+			mMessageAttachment = messageAttachment;
+			
+			// Init Lua
+			mLuaMessageAttachment = LuaValue.tableOf();
+			mLuaMessageAttachment.set("getFilename", new GetFilename());
+			mLuaMessageAttachment.set("getFilesize", new GetFilesize());
+			mLuaMessageAttachment.set("getID", new GetID());
+			mLuaMessageAttachment.set("getURL", new GetURL());
+		}
+		
+		private class GetFilename extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaValue.valueOf(mMessageAttachment.getFilename());
+			}
+		}
+		
+		private class GetFilesize extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaValue.valueOf(mMessageAttachment.getFilesize());
+			}
+		}
+		
+		private class GetID extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaValue.valueOf(mMessageAttachment.getId());
+			}
+		}
+		
+		private class GetURL extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaValue.valueOf(mMessageAttachment.getUrl());
+			}
+		}
+		
+		public LuaValue getTable()
+		{
+			return mLuaMessageAttachment;
 		}
 	}
 	
