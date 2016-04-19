@@ -311,13 +311,21 @@ public class LuaClient
 		}
 	}
 
-	// TODO: implement LuaPrivateChannel
 	private static class GetOrCreatePMChannel extends OneArgFunction
 	{
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			//return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring())))).getTable();
+			try
+			{
+				return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring())))).getTable();
+			}
+			catch (DiscordException | HTTP429Exception e)
+			{
+				logger.error(e.getMessage());
+				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			}
+			
 			return LuaValue.NIL;
 		}
 	}
