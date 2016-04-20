@@ -153,6 +153,8 @@ public class LuaUser
 				{
 					luaRoles.set(luaRoles.length()+1, (new LuaRole(role)).getTable());
 				}
+				
+				return luaRoles;
 			}
 			catch(LuaError e)
 			{
