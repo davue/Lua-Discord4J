@@ -33,9 +33,10 @@ import sx.blah.discord.util.DiscordException;
 
 public class Main 
 {
-	public static IDiscordClient mDiscordClient;					// Client instance of current user
-	public static Globals mLuaEnv = JsePlatform.standardGlobals();	// The main lua environment
-	private static String mLuaPath;
+	public static IDiscordClient 	mDiscordClient;								// Client instance of current user
+	public static LuaClient			mLuaClient;									// Lua Client instance
+	public static Globals 			mLuaEnv = JsePlatform.standardGlobals();	// The main lua environment
+	private static String 			mLuaPath;
 	
 	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
 	public static void main(String[] args) 
@@ -126,6 +127,7 @@ public class Main
 	
 	private static void registerLuaFunctions()
 	{
+		mLuaClient = new LuaClient();
 		mLuaEnv.set("discordClient", LuaClient.getTable());
 	}
 }
