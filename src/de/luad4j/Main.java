@@ -25,6 +25,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import de.luad4j.lua.func.SetTimer;
 import de.luad4j.lua.obj.LuaClient;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
@@ -129,5 +130,8 @@ public class Main
 	{
 		mLuaClient = new LuaClient();
 		mLuaEnv.set("discordClient", LuaClient.getTable());
+		
+		// Define non-discord functions
+		mLuaEnv.set("setTimer", new SetTimer());	// Used to postpone a given function
 	}
 }
