@@ -56,9 +56,15 @@ public class EventHandler
 		}
 	}
 	
-	// Core Events
+	/*// Core Events
 	@EventSubscriber
 	public void onReady(ReadyEvent event) // If Discord API is ready
+	{
+		Main.initializeLua();
+	}*/
+	
+	@EventSubscriber
+	public void onGuildCreate(GuildCreateEvent event) // If Discord API is ready
 	{
 		Main.initializeLua();
 	}
