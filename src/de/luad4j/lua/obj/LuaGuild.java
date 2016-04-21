@@ -88,8 +88,8 @@ public class LuaGuild
 		mLuaGuild.set("getUserByID", new GetUserByID());
 		mLuaGuild.set("getUsers", new GetUsers());
 		mLuaGuild.set("getUsersToBePruned", new GetUsersToBePruned());
-		mLuaGuild.set("getVoiceChanelByID", new GetVoiceChannelByID());
-		mLuaGuild.set("getVoiceChanels", new GetVoiceChannels());
+		mLuaGuild.set("getVoiceChannelByID", new GetVoiceChannelByID());
+		mLuaGuild.set("getVoiceChannels", new GetVoiceChannels());
 		mLuaGuild.set("kickUser", new KickUser());
 		mLuaGuild.set("leaveGuild", new LeaveGuild());
 		mLuaGuild.set("pardonUser", new PardonUser());
