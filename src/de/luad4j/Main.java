@@ -129,7 +129,7 @@ public class Main
 	private static void registerLuaFunctions()
 	{
 		mLuaClient = new LuaClient();
-		mLuaEnv.set("discordClient", LuaClient.getTable());
+		mLuaEnv.set("discord", LuaClient.getTable());
 		
 		// Define non-discord functions
 		mLuaEnv.set("setTimer", new SetTimer());	// Used to postpone a given function
