@@ -66,7 +66,11 @@ public class EventHandler
 	@EventSubscriber
 	public void onGuildCreate(GuildCreateEvent event) // If Discord API is ready
 	{
-		Main.initializeLua();
+		if (!Main.mAlreadyInitialized)
+		{
+			Main.initializeLua();
+			Main.mAlreadyInitialized = true;
+		}
 	}
 	
 	@EventSubscriber

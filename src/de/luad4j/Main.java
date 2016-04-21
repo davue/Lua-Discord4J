@@ -38,6 +38,7 @@ public class Main
 	public static LuaClient			mLuaClient;									// Lua Client instance
 	public static Globals 			mLuaEnv = JsePlatform.standardGlobals();	// The main lua environment
 	private static String 			mLuaPath;
+	public static boolean			mAlreadyInitialized;
 	
 	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
 	public static void main(String[] args) 
@@ -46,6 +47,8 @@ public class Main
 		{			
 			Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 			root.setLevel(Level.INFO);
+			
+			mAlreadyInitialized = false;
 			
 			if(args[0].equals("-user"))
 			{
