@@ -74,11 +74,11 @@ public class LuaClient
 			mLuaClient.set("getChannels", new GetChannels());
 			mLuaClient.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
 			mLuaClient.set("getGuildByID", new GetGuildByID());
-			mLuaClient.set("geGuilds", new GetGuilds());
+			mLuaClient.set("getGuilds", new GetGuilds());
 			mLuaClient.set("getInviteForCode", new GetInviteForCode());
 			mLuaClient.set("getLaunchTime", new GetLaunchTime());
 			mLuaClient.set("getOrCreatePMChannel", new GetOrCreatePMChannel());
-			mLuaClient.set("getOutUser", new GetOurUser());
+			mLuaClient.set("getOurUser", new GetOurUser());
 			mLuaClient.set("getRegionByID", new GetRegionByID());
 			mLuaClient.set("getRegions", new GetRegions());
 			mLuaClient.set("getResponseTime", new GetResponseTime());
