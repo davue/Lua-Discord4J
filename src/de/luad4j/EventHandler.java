@@ -23,6 +23,8 @@ import org.luaj.vm2.LuaError;
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.*;
 import de.luad4j.events.*;
+import de.luad4j.lua.obj.LuaChannel;
+import de.luad4j.lua.obj.LuaGuild;
 import de.luad4j.lua.obj.LuaMessage;
 
 import org.luaj.vm2.LuaValue;
@@ -48,6 +50,19 @@ public class EventHandler
 	}
 	
 	@EventSubscriber
+	public void onJavaError(LuaErrorEvent event)
+	{
+		if(Main.mLuaEnv.get("onLuaError").isfunction())
+		{
+			Main.mLuaEnv.get("onLuaError").call(event.getMessage());
+		}
+		else
+		{
+			logger.warn("[JAVA] onLuaError(string: reason) undefined. It is recommended to define a LuaError event handler.");
+		}
+	}
+	
+	@EventSubscriber
 	public void onPortData(PortDataEvent event)
 	{
 		if(Main.mLuaEnv.get("onPortData").isfunction())
@@ -56,7 +71,93 @@ public class EventHandler
 		}
 	}
 	
-	/*// Core Events
+	// Audio Events
+	@EventSubscriber
+	public void onAudioPlay(AudioPlayEvent event)
+	{
+		LuaValue audio = LuaValue.tableOf();
+		event.
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
+	}
+	
+	@EventSubscriber
+	public void onAudioQueued(AudioQueuedEvent event)
+	{
+		LuaValue audio = LuaValue.tableOf();
+		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
+	}
+	
+	@EventSubscriber
+	public void onAudioStop(AudioStopEvent event)
+	{
+		LuaValue audio = LuaValue.tableOf();
+		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
+	}
+	
+	@EventSubscriber
+	public void onAudioUnqueued(AudioUnqueuedEvent event)
+	{
+		LuaValue audio = LuaValue.tableOf();
+		
+		if(event.getFileSource().isPresent())
+		{
+			audio.set("file", event.getFileSource().get().getAbsolutePath());
+		}
+		
+		if(event.getUrlSource().isPresent())
+		{
+			audio.set("url", event.getUrlSource().get().getPath());
+		}
+		
+		audio.set("format", event.getFormat().toString());
+	}
+	
+	@EventSubscriber
+	public void onChannelCreate(ChannelCreateEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onChannelCreate").checkfunction().call((new LuaChannel(event.getChannel())).getTable());
+		}
+		catch (LuaError e)
+		{
+			
+		}
+	}
+	
+	/*
 	@EventSubscriber
 	public void onReady(ReadyEvent event) // If Discord API is ready
 	{
@@ -65,12 +166,14 @@ public class EventHandler
 	
 	@EventSubscriber
 	public void onGuildCreate(GuildCreateEvent event) // If Discord API is ready
-	{
-		if (!Main.mAlreadyInitialized)
+	{	
+		if (!Main.mAlreadyInitialized) // Don't initialize again, if another guild was created
 		{
 			Main.initializeLua();
 			Main.mAlreadyInitialized = true;
 		}
+		
+		Main.mLuaEnv.get("onGuildCreate").checkfunction().call(new LuaGuild(event.getGuild()).getTable());
 	}
 	
 	@EventSubscriber
@@ -196,84 +299,5 @@ public class EventHandler
 			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
 			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
 		}
-	}
-	
-	// Audio Events
-	@EventSubscriber
-	public void onAudioPlay(AudioPlayEvent event)
-	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
-		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
-		}
-		
-		if(event.getUrlSource().isPresent())
-		{
-			audio.set("url", event.getUrlSource().get().getPath());
-		}
-		
-		audio.set("format", event.getFormat().toString());
-	}
-	
-	@EventSubscriber
-	public void onAudioQueued(AudioQueuedEvent event)
-	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
-		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
-		}
-		
-		if(event.getUrlSource().isPresent())
-		{
-			audio.set("url", event.getUrlSource().get().getPath());
-		}
-		
-		audio.set("format", event.getFormat().toString());
-	}
-	
-	@EventSubscriber
-	public void onAudioReceive(AudioReceiveEvent event)
-	{
-		
-	}
-	
-	@EventSubscriber
-	public void onAudioStop(AudioStopEvent event)
-	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
-		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
-		}
-		
-		if(event.getUrlSource().isPresent())
-		{
-			audio.set("url", event.getUrlSource().get().getPath());
-		}
-		
-		audio.set("format", event.getFormat().toString());
-	}
-	
-	@EventSubscriber
-	public void onAudioUnqueued(AudioUnqueuedEvent event)
-	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
-		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
-		}
-		
-		if(event.getUrlSource().isPresent())
-		{
-			audio.set("url", event.getUrlSource().get().getPath());
-		}
-		
-		audio.set("format", event.getFormat().toString());
 	}
 }
