@@ -30,11 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import de.luad4j.Main;
 import de.luad4j.events.JavaErrorEvent;
-import de.luad4j.lua.obj.LuaMessage;
 
 public class SetTimer extends VarArgFunction
 {
-	protected static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	protected static final Logger mLogger = LoggerFactory.getLogger(SetTimer.class);	// Logger of this class
 	
 	@Override
 	public LuaValue invoke(Varargs varargs) 

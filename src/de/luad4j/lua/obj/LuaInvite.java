@@ -32,7 +32,7 @@ public class LuaInvite
 	private final IInvite 	mInvite;	// Invite Object inside Java
 	private final LuaValue	mLuaInvite;	// Lua implementation of Invite
 	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaUser.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaInvite.class);	// Logger of this class
 	
 	public LuaInvite(IInvite invite)
 	{

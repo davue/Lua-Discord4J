@@ -29,13 +29,12 @@ import org.slf4j.LoggerFactory;
 
 import de.luad4j.events.JavaErrorEvent;
 import de.luad4j.events.PortDataEvent;
-import de.luad4j.lua.obj.LuaMessage;
 
 public class PortListener extends Thread
 {
 	private final int mPort;	// The port, the port listener is listening to
 	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(PortListener.class);	// Logger of this class
 	
 	public PortListener(int port)
 	{

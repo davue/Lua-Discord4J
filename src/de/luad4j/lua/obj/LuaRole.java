@@ -39,7 +39,7 @@ public class LuaRole
 	private final IRole 	mRole;		// Role object inside Java
 	private final LuaValue 	mLuaRole;	// Lua implementation of Role
 	
-	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger logger = LoggerFactory.getLogger(LuaRole.class);	// Logger of this class
 	
 	public LuaRole(IRole role)
 	{

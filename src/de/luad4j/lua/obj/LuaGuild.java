@@ -50,7 +50,7 @@ public class LuaGuild
 	private final IGuild	mGuild;		// Guild object inside Java
 	private final LuaValue 	mLuaGuild;	// Lua implementation of Guild
 	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaGuild.class);	// Logger of this class
 	
 	public LuaGuild(IGuild guild)
 	{

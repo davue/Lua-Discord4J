@@ -46,7 +46,7 @@ public class LuaChannel
 	protected final IChannel mChannel;		// Channel inside Java
 	protected final LuaValue mLuaChannel;	// Lua implementation of Channel
 	
-	protected static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	protected static final Logger mLogger = LoggerFactory.getLogger(LuaChannel.class);	// Logger of this class
 	
 	public LuaChannel(IChannel channel)
 	{

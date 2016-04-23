@@ -51,7 +51,7 @@ public class LuaClient
 	private static IDiscordClient 	mClient; 	// Client object inside Java
 	private static LuaValue 		mLuaClient; // Table: Client object inside Lua
 	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaClient.class);	// Logger of this class
 
 	public LuaClient()
 	{

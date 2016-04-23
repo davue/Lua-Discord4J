@@ -27,7 +27,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import de.luad4j.lua.func.SetTimer;
 import de.luad4j.lua.obj.LuaClient;
-import de.luad4j.lua.obj.LuaMessage;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
@@ -41,7 +40,7 @@ public class Main
 	public static boolean					mAlreadyInitialized;								// If lua has already been initialized
 	
 	private static String 					mLuaPath;											// The path to the lua main file
-	private static final org.slf4j.Logger 	mLogger = LoggerFactory.getLogger(LuaMessage.class);// Logger of this class
+	private static final org.slf4j.Logger 	mLogger = LoggerFactory.getLogger(Main.class);		// Logger of this class
 	
 	@SuppressWarnings("deprecation")	// Support user login as long as Discord4J supports it
 	public static void main(String[] args) 
