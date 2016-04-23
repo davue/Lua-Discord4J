@@ -45,8 +45,6 @@ public class LuaChannel
 		mLuaChannel.set("getGuild", new GetGuild());
 		mLuaChannel.set("getID", new GetID());
 		mLuaChannel.set("getInvites", new GetInvites());
-		mLuaChannel.set("getLastReadMessage", new GetLastReadMessage());
-		mLuaChannel.set("getLastReadMessageID", new GetLastReadMessageID());
 		mLuaChannel.set("getMessageByID", new GetMessageByID());
 		mLuaChannel.set("getMessages", new GetMessages());
 		mLuaChannel.set("getModifiedRolePermissions", new GetModifiedRolePermissions());
@@ -211,24 +209,6 @@ public class LuaChannel
 			}*/
 			
 			return LuaValue.NIL;
-		}
-	}
-	
-	private class GetLastReadMessage extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call()
-		{
-			return (new LuaMessage(mChannel.getLastReadMessage())).getTable();
-		}
-	}
-	
-	private class GetLastReadMessageID extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call()
-		{
-			return LuaValue.valueOf(mChannel.getLastReadMessageID());
 		}
 	}
 	

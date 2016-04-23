@@ -48,7 +48,6 @@ public class LuaMessage
 		
 		// Init Lua
 		mLuaMessage = LuaValue.tableOf();
-		mLuaMessage.set("acknowledge", new Acknowledge());
 		mLuaMessage.set("delete", new Delete());
 		mLuaMessage.set("edit", new Edit());
 		mLuaMessage.set("getAttachments", new GetAttachments());
@@ -61,28 +60,8 @@ public class LuaMessage
 		mLuaMessage.set("getID", new GetID());
 		mLuaMessage.set("getMentions", new GetMentions());
 		mLuaMessage.set("getTimestamp", new GetTimestamp());
-		mLuaMessage.set("isAcknowledged", new IsAcknowledged());
 		mLuaMessage.set("mentionsEveryone", new MentionsEveryone());
 		mLuaMessage.set("reply", new Reply());
-	}
-	
-	private class Acknowledge extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call() 
-		{
-			try
-			{
-				mMessage.acknowledge();
-			}
-			catch (HTTP429Exception | DiscordException e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
-		}
 	}
 	
 	private class Delete extends ZeroArgFunction
@@ -250,15 +229,6 @@ public class LuaMessage
 		public LuaValue call() 
 		{
 			return LuaValue.valueOf(mMessage.getTimestamp().toString());
-		}
-	}
-
-	private class IsAcknowledged extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call() 
-		{
-			return LuaValue.valueOf(mMessage.isAcknowledged());
 		}
 	}
 	
