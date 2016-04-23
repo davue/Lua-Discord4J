@@ -47,9 +47,10 @@ import sx.blah.discord.util.MissingPermissionsException;
 
 public class LuaGuild
 {
-	private static IGuild mGuild;
-	private static LuaValue mLuaGuild;
-	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private final IGuild	mGuild;		// Guild object inside Java
+	private final LuaValue 	mLuaGuild;	// Lua implementation of Guild
+	
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 	
 	public LuaGuild(IGuild guild)
 	{
@@ -114,7 +115,7 @@ public class LuaGuild
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -133,7 +134,7 @@ public class LuaGuild
 			}
 			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -152,7 +153,7 @@ public class LuaGuild
 			}
 			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -172,7 +173,7 @@ public class LuaGuild
 			}
 			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -191,7 +192,7 @@ public class LuaGuild
 			}
 			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -210,7 +211,7 @@ public class LuaGuild
 			}
 			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -229,7 +230,7 @@ public class LuaGuild
 			}
 			catch (DiscordException | MissingPermissionsException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -248,7 +249,7 @@ public class LuaGuild
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 
@@ -267,7 +268,7 @@ public class LuaGuild
 			}
 			catch (DiscordException | MissingPermissionsException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -286,7 +287,7 @@ public class LuaGuild
 			}
 			catch (DiscordException | HTTP429Exception | MissingPermissionsException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -311,7 +312,7 @@ public class LuaGuild
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -348,7 +349,7 @@ public class LuaGuild
 			}
 			catch(DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -375,7 +376,7 @@ public class LuaGuild
 			}
 			catch (LuaError | HTTP429Exception | DiscordException e )
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -410,7 +411,7 @@ public class LuaGuild
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -481,7 +482,7 @@ public class LuaGuild
 			}
 			catch (LuaError | DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -552,7 +553,7 @@ public class LuaGuild
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 
@@ -587,7 +588,7 @@ public class LuaGuild
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -606,7 +607,7 @@ public class LuaGuild
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -641,7 +642,7 @@ public class LuaGuild
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -660,7 +661,7 @@ public class LuaGuild
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -679,7 +680,7 @@ public class LuaGuild
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -698,7 +699,7 @@ public class LuaGuild
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -717,7 +718,7 @@ public class LuaGuild
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -738,7 +739,7 @@ public class LuaGuild
 			}
 			catch (HTTP429Exception | MissingPermissionsException | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			

@@ -27,6 +27,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import de.luad4j.lua.func.SetTimer;
 import de.luad4j.lua.obj.LuaClient;
+import de.luad4j.lua.obj.LuaMessage;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventDispatcher;
 import sx.blah.discord.api.IDiscordClient;
@@ -34,50 +35,52 @@ import sx.blah.discord.util.DiscordException;
 
 public class Main 
 {
-	public static IDiscordClient 	mDiscordClient;								// Client instance of current user
-	public static LuaClient			mLuaClient;									// Lua Client instance
-	public static Globals 			mLuaEnv = JsePlatform.standardGlobals();	// The main lua environment
-	private static String 			mLuaPath;
-	public static boolean			mAlreadyInitialized;
+	public static IDiscordClient 			mDiscordClient;										// Client instance of current user
+	public static LuaClient					mLuaClient;											// Lua client instance
+	public static Globals 					mLuaEnv = JsePlatform.standardGlobals();			// The main lua environment
+	public static boolean					mAlreadyInitialized;								// If lua has already been initialized
 	
-	@SuppressWarnings("deprecation") // Testuser needs to be converted to botuser
+	private static String 					mLuaPath;											// The path to the lua main file
+	private static final org.slf4j.Logger 	mLogger = LoggerFactory.getLogger(LuaMessage.class);// Logger of this class
+	
+	@SuppressWarnings("deprecation")	// Support user login as long as Discord4J supports it
 	public static void main(String[] args) 
 	{
 		if(args.length >= 4)
-		{			
+		{	
+			// Set logger level to INFO
 			Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 			root.setLevel(Level.INFO);
 			
+			// Lua isn't initialized yet
 			mAlreadyInitialized = false;
 			
-			if(args[0].equals("-user"))
+			// Check for parameters
+			if(args[0].equals("-user")) // Login into Discord with user
 			{
 				mLuaPath = args[3];
 				
-				// Login into Discord
 				ClientBuilder builder = new ClientBuilder();
 				builder.withLogin(args[1], args[2]);
 				
 				loginDiscord(builder);
 			}
-			else if(args[0].equals("-bot"))
+			else if(args[0].equals("-bot")) // Login into Discord with bottoken
 			{
 				mLuaPath = args[2];
 				
-				// Login into Discord
 				ClientBuilder builder = new ClientBuilder();
 				builder.withToken(args[1]);
 				
 				loginDiscord(builder);
 			}
-			else
+			else // Print usage and exit
 			{
 				System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
 				System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
 				System.exit(0);
 			}
 
-			
 			// Start port listener if desired
 			if(!args[args.length-1].equals(mLuaPath))
 			{
@@ -86,7 +89,7 @@ public class Main
 			}
 			else
 			{
-				System.out.println("[INFO] Running without port listener.");
+				mLogger.info("Running without port listener.");
 			}
 
 			// Start event listener
@@ -109,8 +112,7 @@ public class Main
 		} 
 		catch (DiscordException e) 
 		{
-			System.err.println("[JAVA][Main] Error occurred while logging in!");
-			e.printStackTrace();
+			mLogger.error("Failed to login: " + e.getErrorMessage());
 		}
 	}
 	
@@ -122,15 +124,15 @@ public class Main
 			registerLuaFunctions(); // Register lua functions
 			mLuaEnv.get("dofile").call(mLuaPath); // Execute lua main file
 		} 
-		catch (LuaError err)
+		catch (LuaError e)
 		{
-			System.err.println("[JAVA][Main] Error occured while loading lua main file!");
-			err.printStackTrace();
+			mLogger.error("Failed to load lua main file: " + e.getMessage());
 		}
 	}
 	
 	private static void registerLuaFunctions()
 	{
+		// Create new lua client and set it global
 		mLuaClient = new LuaClient();
 		mLuaEnv.set("discord", LuaClient.getTable());
 		

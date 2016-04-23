@@ -27,14 +27,15 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.luad4j.events.JavaErrorEvent;
 import de.luad4j.events.PortDataEvent;
 import de.luad4j.lua.obj.LuaMessage;
 
 public class PortListener extends Thread
 {
-	private final int mPort;
+	private final int mPort;	// The port, the port listener is listening to
 	
-	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 	
 	public PortListener(int port)
 	{
@@ -47,14 +48,18 @@ public class PortListener extends Thread
 		ServerSocket serverSocket;
 		try 
 		{
+			// Create new socket
 			serverSocket = new ServerSocket(mPort);
 
 			while (true)
 			{
+				// Waits for connection and accepts it
 				Socket socket = serverSocket.accept();
 				
+				// Save input stream
 				BufferedReader in = new BufferedReader (new InputStreamReader (socket.getInputStream ()));
 				
+				// Read input stream, line by line
 				String line = "";
 				String message = "";
 				while((line=in.readLine()) != null)
@@ -63,12 +68,14 @@ public class PortListener extends Thread
 					line = "";
 				}
 				
+				// Dispatch event with data
 				Main.mDiscordClient.getDispatcher().dispatch(new PortDataEvent(message));
 			}
 		} 
 		catch (IOException e) 
 		{
-			logger.error(e.getMessage());
+			mLogger.error(e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 	}
 }

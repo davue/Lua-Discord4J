@@ -22,6 +22,9 @@ import sx.blah.discord.api.Event;
 
 public class JavaErrorEvent extends Event
 {
+	/*
+	 * The error message
+	 */
 	private final String message;
 	
 	public JavaErrorEvent(String msg)
@@ -29,6 +32,11 @@ public class JavaErrorEvent extends Event
 		message = msg;
 	}
 	
+	/*
+	 * Returns the error message.
+	 * 
+	 * @return The message of the error.
+	 */
 	public String getMessage()
 	{
 		return message;

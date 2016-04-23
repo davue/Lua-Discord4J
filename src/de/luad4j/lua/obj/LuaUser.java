@@ -37,8 +37,8 @@ import sx.blah.discord.util.MissingPermissionsException;
 
 public class LuaUser
 {
-	private IUser		mUser;			// User object inside Java
-	private LuaValue	mLuaUser;		// Table: User object inside Lua
+	private final IUser		mUser;			// User object inside Java
+	private final LuaValue	mLuaUser;		// Lua implementation of User
 	
 	private static final Logger logger = LoggerFactory.getLogger(LuaUser.class);	// Logger of this class
 	

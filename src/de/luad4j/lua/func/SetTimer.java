@@ -25,9 +25,17 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.luad4j.Main;
+import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.obj.LuaMessage;
 
 public class SetTimer extends VarArgFunction
 {
+	protected static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	
 	@Override
 	public LuaValue invoke(Varargs varargs) 
 	{
@@ -40,13 +48,14 @@ public class SetTimer extends VarArgFunction
 				@Override
 				public void run()
 				{
-					varargs.arg(2).checkfunction().invoke(varargs.subargs(3));
+					varargs.arg(2).checkfunction().invoke(varargs.subargs(3)); // Call lua function with varargs
 				}
 			}, varargs.arg(1).checklong());
 		}
 		catch(LuaError e)
 		{
-			return LuaValue.valueOf("LuaError");
+			mLogger.error(e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 		
 		return LuaValue.NIL;

@@ -22,15 +22,23 @@ import sx.blah.discord.api.Event;
 
 public class PortDataEvent extends Event
 {
-	private final String message;
+	/*
+	 * The received data.
+	 */
+	private final String mData;
 	
-	public PortDataEvent(String msg)
+	public PortDataEvent(String data)
 	{
-		message = msg;
+		mData = data;
 	}
 	
-	public String getMessage()
+	/*
+	 * Returns the data received.
+	 * 
+	 * @return The data.
+	 */
+	public String getData()
 	{
-		return message;
+		return mData;
 	}
 }

@@ -51,7 +51,7 @@ public class LuaClient
 	private static IDiscordClient 	mClient; 	// Client object inside Java
 	private static LuaValue 		mLuaClient; // Table: Client object inside Lua
 	
-	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 
 	public LuaClient()
 	{
@@ -113,7 +113,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -132,7 +132,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -151,7 +151,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -170,7 +170,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -191,7 +191,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -226,7 +226,7 @@ public class LuaClient
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -251,7 +251,7 @@ public class LuaClient
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 
@@ -285,7 +285,7 @@ public class LuaClient
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 
@@ -322,7 +322,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -366,7 +366,7 @@ public class LuaClient
 			}
 			catch (LuaError | DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -427,7 +427,7 @@ public class LuaClient
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -464,7 +464,7 @@ public class LuaClient
 			}
 			catch (DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -483,7 +483,7 @@ public class LuaClient
 			}
 			catch (DiscordException | HTTP429Exception e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			

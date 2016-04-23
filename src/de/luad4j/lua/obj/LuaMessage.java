@@ -37,10 +37,10 @@ import sx.blah.discord.util.MissingPermissionsException;
 
 public class LuaMessage 
 {
-	private IMessage 	mMessage;		// Message object inside Java
-	private LuaValue 	mLuaMessage;	// Table: Message object inside Lua
+	private final IMessage 	mMessage;		// Message object inside Java
+	private final LuaValue 	mLuaMessage;	// Table: Message object inside Lua
 	
-	private static final Logger logger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
+	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 	
 	public LuaMessage(IMessage message)
 	{
@@ -75,7 +75,7 @@ public class LuaMessage
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -94,7 +94,7 @@ public class LuaMessage
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -121,7 +121,7 @@ public class LuaMessage
 			}
 			catch (LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -215,7 +215,7 @@ public class LuaMessage
 			}
 			catch(LuaError e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			
@@ -252,7 +252,7 @@ public class LuaMessage
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
 			{
-				logger.error(e.getMessage());
+				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 			}
 			

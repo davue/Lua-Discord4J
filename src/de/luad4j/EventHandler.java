@@ -72,7 +72,7 @@ public class EventHandler
 	{
 		if (Main.mLuaEnv.get("onPortData").isfunction())
 		{
-			Main.mLuaEnv.get("onPortData").call(event.getMessage());
+			Main.mLuaEnv.get("onPortData").call(event.getData());
 		}
 	}
 
