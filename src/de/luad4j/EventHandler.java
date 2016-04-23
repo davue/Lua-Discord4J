@@ -18,28 +18,33 @@
 
 package de.luad4j;
 
-import org.luaj.vm2.LuaError;
+import java.util.List;
 
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.*;
+import sx.blah.discord.handle.obj.IRole;
 import de.luad4j.events.*;
 import de.luad4j.lua.obj.LuaChannel;
 import de.luad4j.lua.obj.LuaGuild;
+import de.luad4j.lua.obj.LuaInvite;
 import de.luad4j.lua.obj.LuaMessage;
+import de.luad4j.lua.obj.LuaRole;
+import de.luad4j.lua.obj.LuaUser;
+import de.luad4j.lua.obj.LuaVoiceChannel;
 
 import org.luaj.vm2.LuaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EventHandler 
+public class EventHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
-	
+
 	// Custom Events
 	@EventSubscriber
 	public void onLuaError(LuaErrorEvent event)
 	{
-		if(Main.mLuaEnv.get("onLuaError").isfunction())
+		if (Main.mLuaEnv.get("onLuaError").isfunction())
 		{
 			Main.mLuaEnv.get("onLuaError").call(event.getMessage());
 		}
@@ -48,256 +53,712 @@ public class EventHandler
 			logger.warn("[JAVA] onLuaError(string: reason) undefined. It is recommended to define a LuaError event handler.");
 		}
 	}
-	
+
 	@EventSubscriber
 	public void onJavaError(LuaErrorEvent event)
 	{
-		if(Main.mLuaEnv.get("onLuaError").isfunction())
+		if (Main.mLuaEnv.get("onLuaError").isfunction())
 		{
 			Main.mLuaEnv.get("onLuaError").call(event.getMessage());
 		}
 		else
 		{
-			logger.warn("[JAVA] onLuaError(string: reason) undefined. It is recommended to define a LuaError event handler.");
+			logger.warn("[JAVA] onJavaError(string: reason) undefined. It is recommended to define a JavaError event handler.");
 		}
 	}
-	
+
 	@EventSubscriber
 	public void onPortData(PortDataEvent event)
 	{
-		if(Main.mLuaEnv.get("onPortData").isfunction())
+		if (Main.mLuaEnv.get("onPortData").isfunction())
 		{
 			Main.mLuaEnv.get("onPortData").call(event.getMessage());
 		}
 	}
-	
-	// Audio Events
+
 	@EventSubscriber
-	public void onAudioPlay(AudioPlayEvent event)
+	public void onAudioPlayEvent(AudioPlayEvent event)
 	{
-		LuaValue audio = LuaValue.tableOf();
-		event.
-		if(event.getFileSource().isPresent())
+		try
 		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
+			LuaValue audio = LuaValue.tableOf();
+			if(event.getFileSource().isPresent())
+			{
+				audio.set("file", event.getFileSource().get().getAbsolutePath());
+			}
+			
+			if(event.getUrlSource().isPresent())
+			{
+				audio.set("url", event.getUrlSource().get().toExternalForm());
+			}
+			
+			audio.set("format", event.getFormat().toString());
+			
+			Main.mLuaEnv.get("onAudioPlay").checkfunction().call(audio);
 		}
-		
-		if(event.getUrlSource().isPresent())
+		catch (Exception e)
 		{
-			audio.set("url", event.getUrlSource().get().getPath());
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
-		
-		audio.set("format", event.getFormat().toString());
 	}
-	
 	@EventSubscriber
-	public void onAudioQueued(AudioQueuedEvent event)
+	public void onAudioQueuedEvent(AudioQueuedEvent event)
 	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
+		try
 		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
+			LuaValue audio = LuaValue.tableOf();
+			if(event.getFileSource().isPresent())
+			{
+				audio.set("file", event.getFileSource().get().getAbsolutePath());
+			}
+			
+			if(event.getUrlSource().isPresent())
+			{
+				audio.set("url", event.getUrlSource().get().toExternalForm());
+			}
+			
+			audio.set("format", event.getFormat().toString());
+			
+			Main.mLuaEnv.get("onAudioQueued").checkfunction().call(audio);
 		}
-		
-		if(event.getUrlSource().isPresent())
+		catch (Exception e)
 		{
-			audio.set("url", event.getUrlSource().get().getPath());
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
-		
-		audio.set("format", event.getFormat().toString());
 	}
-	
+	// AudioReceiveEvent not needed
 	@EventSubscriber
-	public void onAudioStop(AudioStopEvent event)
+	public void onAudioStopEvent(AudioStopEvent event)
 	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
+		try
 		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
+			LuaValue audio = LuaValue.tableOf();
+			if(event.getFileSource().isPresent())
+			{
+				audio.set("file", event.getFileSource().get().getAbsolutePath());
+			}
+			
+			if(event.getUrlSource().isPresent())
+			{
+				audio.set("url", event.getUrlSource().get().toExternalForm());
+			}
+			
+			audio.set("format", event.getFormat().toString());
+			
+			Main.mLuaEnv.get("onAudioStop").checkfunction().call(audio);
 		}
-		
-		if(event.getUrlSource().isPresent())
+		catch (Exception e)
 		{
-			audio.set("url", event.getUrlSource().get().getPath());
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
-		
-		audio.set("format", event.getFormat().toString());
 	}
-	
 	@EventSubscriber
-	public void onAudioUnqueued(AudioUnqueuedEvent event)
+	public void onAudioUnqueuedEvent(AudioUnqueuedEvent event)
 	{
-		LuaValue audio = LuaValue.tableOf();
-		
-		if(event.getFileSource().isPresent())
+		try
 		{
-			audio.set("file", event.getFileSource().get().getAbsolutePath());
+			LuaValue audio = LuaValue.tableOf();
+			if(event.getFileSource().isPresent())
+			{
+				audio.set("file", event.getFileSource().get().getAbsolutePath());
+			}
+			
+			if(event.getUrlSource().isPresent())
+			{
+				audio.set("url", event.getUrlSource().get().toExternalForm());
+			}
+			
+			audio.set("format", event.getFormat().toString());
+			
+			Main.mLuaEnv.get("onAudioUnqueued").checkfunction().call(audio);
 		}
-		
-		if(event.getUrlSource().isPresent())
+		catch (Exception e)
 		{
-			audio.set("url", event.getUrlSource().get().getPath());
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
-		
-		audio.set("format", event.getFormat().toString());
 	}
-	
 	@EventSubscriber
-	public void onChannelCreate(ChannelCreateEvent event)
+	public void onChannelCreateEvent(ChannelCreateEvent event)
 	{
 		try
 		{
 			Main.mLuaEnv.get("onChannelCreate").checkfunction().call((new LuaChannel(event.getChannel())).getTable());
 		}
-		catch (LuaError e)
+		catch (Exception e)
 		{
-			
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 	}
-	
-	/*
 	@EventSubscriber
-	public void onReady(ReadyEvent event) // If Discord API is ready
+	public void onChannelDeleteEvent(ChannelDeleteEvent event)
 	{
-		Main.initializeLua();
-	}*/
-	
+		try
+		{
+			Main.mLuaEnv.get("onChannelDelete").checkfunction().call((new LuaChannel(event.getChannel())).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
 	@EventSubscriber
-	public void onGuildCreate(GuildCreateEvent event) // If Discord API is ready
-	{	
+	public void onChannelUpdateEvent(ChannelUpdateEvent event)
+	{
+		try
+		{
+			LuaValue channels = LuaValue.tableOf();
+			channels.set("old", (new LuaChannel(event.getOldChannel())).getTable());
+			channels.set("new", (new LuaChannel(event.getNewChannel())).getTable());
+			
+			Main.mLuaEnv.get("onChannelUpdate").checkfunction().call(channels);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onDiscordDisconnectedEvent(DiscordDisconnectedEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onDiscordDisconnected").checkfunction().call(event.getReason().name());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onGameChangeEvent(GameChangeEvent event)
+	{
+		try
+		{
+			LuaValue games = LuaValue.tableOf();
+			games.set("old", event.getOldGame().orElse("nil"));
+			games.set("new", event.getNewGame().orElse("nil"));
+			
+			Main.mLuaEnv.get("onGameChange").checkfunction().call(games);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onGuildCreateEvent(GuildCreateEvent event)
+	{
 		if (!Main.mAlreadyInitialized) // Don't initialize again, if another guild was created
 		{
 			Main.initializeLua();
 			Main.mAlreadyInitialized = true;
 		}
 		
-		Main.mLuaEnv.get("onGuildCreate").checkfunction().call(new LuaGuild(event.getGuild()).getTable());
-	}
-	
-	@EventSubscriber
-	public void onDiscordDisconnected(DiscordDisconnectedEvent event) // If connection is lost
-	{
-		String MethodName = "onDiscordDisconnected";
-		
 		try
 		{
-			if(Main.mLuaEnv.get(MethodName).isfunction())
-			{
-				Main.mLuaEnv.get(MethodName).call(LuaValue.valueOf(event.getReason().toString()));
-			}
-		} 
-		catch(LuaError e) 
+			Main.mLuaEnv.get("onGuildCreate").checkfunction().call((new LuaGuild(event.getGuild())).getTable());
+		}
+		catch (Exception e)
 		{
-			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
-		}	
-	}
-	
-	// Message Events
-	@EventSubscriber
-	public void onMessageReceived(MessageReceivedEvent event)
-	{
-		String MethodName = "onMessageReceived";
-		
-		try 
-		{
-			if(Main.mLuaEnv.get(MethodName).isfunction())
-			{
-				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getMessage()).getTable());
-			}
-		} 
-		catch(LuaError e) 
-		{
-			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
-		}	
-	}
-	
-	@EventSubscriber
-	public void onMessageSend(MessageSendEvent event)
-	{
-		// not needed
-	}
-	
-	@EventSubscriber
-	public void onMessageDeleted(MessageDeleteEvent event)
-	{
-		String MethodName = "onMessageDeleted";
-		
-		try
-		{
-			if(Main.mLuaEnv.get(MethodName).isfunction())
-			{
-				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getMessage()).getTable());
-			}
-		} 
-		catch(LuaError e) 
-		{
-			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 	}
-	
 	@EventSubscriber
-	public void onMessageUpdated(MessageUpdateEvent event)
+	public void onGuildLeaveEvent(GuildLeaveEvent event)
 	{
-		String MethodName = "onMessageUpdated";
-		
 		try
 		{
-			if(Main.mLuaEnv.get(MethodName).isfunction())
-			{
-				LuaValue messages = LuaValue.tableOf();
-				messages.set("old", new LuaMessage(event.getOldMessage()).getTable());
-				messages.set("new", new LuaMessage(event.getNewMessage()).getTable());
-				
-				Main.mLuaEnv.get(MethodName).call(messages);
-			}
-		} 
-		catch(LuaError e) 
+			Main.mLuaEnv.get("onGuildLeave").checkfunction().call((new LuaGuild(event.getGuild())).getTable());
+		}
+		catch (Exception e)
 		{
-			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 	}
-	
 	@EventSubscriber
-	public void onMessageAcknowledged(MessageAcknowledgedEvent event)
+	public void onGuildTransferOwnershipEvent(GuildTransferOwnershipEvent event)
 	{
-		String MethodName = "onMessageAcknowledged";
-		
 		try
 		{
-			if(Main.mLuaEnv.get(MethodName).isfunction())
-			{
-				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getAcknowledgedMessage()).getTable());
-			}
-		} 
-		catch(LuaError e) 
+			LuaValue guildTransferEvent = LuaValue.tableOf();
+			guildTransferEvent.set("guild", (new LuaGuild(event.getGuild()).getTable()));
+			guildTransferEvent.set("oldowner", (new LuaUser(event.getOldOwner()).getTable()));
+			guildTransferEvent.set("newowner", (new LuaUser(event.getNewOwner()).getTable()));
+			
+			Main.mLuaEnv.get("onGuildTransferOwnership").checkfunction().call(guildTransferEvent);
+		}
+		catch (Exception e)
 		{
-			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 	}
-	
 	@EventSubscriber
-	public void onMention(MentionEvent event)
+	public void onGuildUnavailableEvent(GuildUnavailableEvent event)
 	{
-		String MethodName = "onMention";
-		
 		try
 		{
-			if(Main.mLuaEnv.get(MethodName).isfunction())
-			{
-				Main.mLuaEnv.get(MethodName).call(new LuaMessage(event.getMessage()).getTable());
-			}
-		} 
-		catch(LuaError e) 
+			Main.mLuaEnv.get("onGuildUnavailable").checkfunction().call((new LuaGuild(event.getGuild())).getTable());
+		}
+		catch (Exception e)
 		{
-			logger.error("[JAVA] A Lua error occured while calling event: " + MethodName + "\n" + e.getMessage());
-			Main.mDiscordClient.getDispatcher().dispatch(new LuaErrorEvent(e.getMessage()));
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onGuildUpdateEvent(GuildUpdateEvent event)
+	{
+		try
+		{
+			LuaValue guilds = LuaValue.tableOf();
+			guilds.set("old", (new LuaGuild(event.getOldGuild())).getTable());
+			guilds.set("new", (new LuaGuild(event.getNewGuild())).getTable());
+			
+			Main.mLuaEnv.get("onGuildUpdate").checkfunction().call(guilds);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onInviteReceivedEvent(InviteReceivedEvent event)
+	{
+		try
+		{
+			LuaValue inviteEvent = LuaValue.tableOf();
+			inviteEvent.set("invite", (new LuaInvite(event.getInvite())).getTable());
+			inviteEvent.set("message", (new LuaMessage(event.getMessage())).getTable());
+			
+			Main.mLuaEnv.get("onInviteReceived").checkfunction().call(inviteEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onMentionEvent(MentionEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onMention").checkfunction().call((new LuaMessage(event.getMessage())).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onMessageDeleteEvent(MessageDeleteEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onMessageDelete").checkfunction().call((new LuaMessage(event.getMessage())).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onMessageReceivedEvent(MessageReceivedEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onMessageReceived").checkfunction().call((new LuaMessage(event.getMessage())).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onMessageSendEvent(MessageSendEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onMessageSend").checkfunction().call((new LuaMessage(event.getMessage())).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onMessageUpdateEvent(MessageUpdateEvent event)
+	{
+		try
+		{
+			LuaValue messages = LuaValue.tableOf();
+			messages.set("old", (new LuaMessage(event.getOldMessage())).getTable());
+			messages.set("new", (new LuaMessage(event.getOldMessage())).getTable());
+			
+			Main.mLuaEnv.get("onMessageUpdate").checkfunction().call(messages);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	// ModuleDisabledEvent not needed
+	// ModuleEnabledEvent not needed
+	@EventSubscriber
+	public void onPresenceUpdateEvent(PresenceUpdateEvent event)
+	{
+		try
+		{
+			LuaValue presences = LuaValue.tableOf();
+			presences.set("old", event.getOldPresence().name());
+			presences.set("new", event.getNewPresence().name());
+			
+			Main.mLuaEnv.get("onPresenceUpdate").checkfunction().call(presences);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	// ReadyEvent not needed
+	@EventSubscriber
+	public void onRoleCreateEvent(RoleCreateEvent event)
+	{
+		try
+		{
+			LuaValue roleEvent = LuaValue.tableOf();
+			roleEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			roleEvent.set("role", (new LuaRole(event.getRole())).getTable());
+			
+			Main.mLuaEnv.get("onRoleCreate").checkfunction().call(roleEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onRoleDeleteEvent(RoleDeleteEvent event)
+	{
+		try
+		{
+			LuaValue roleEvent = LuaValue.tableOf();
+			roleEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			roleEvent.set("role", (new LuaRole(event.getRole())).getTable());
+			
+			Main.mLuaEnv.get("onRoleDelete").checkfunction().call(roleEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onRoleUpdateEvent(RoleUpdateEvent event)
+	{
+		try
+		{
+			LuaValue roleEvent = LuaValue.tableOf();
+			roleEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			roleEvent.set("oldrole", (new LuaRole(event.getOldRole())).getTable());
+			roleEvent.set("newrole", (new LuaRole(event.getNewRole())).getTable());
+			
+			Main.mLuaEnv.get("onRoleUpdate").checkfunction().call(roleEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onTypingEvent(TypingEvent event)
+	{
+		try
+		{
+			LuaValue typingEvent = LuaValue.tableOf();
+			typingEvent.set("channel", (new LuaChannel(event.getChannel())).getTable());
+			typingEvent.set("user", (new LuaUser(event.getUser())).getTable());
+			
+			Main.mLuaEnv.get("onTyping").checkfunction().call(typingEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserBanEvent(UserBanEvent event)
+	{
+		try
+		{
+			LuaValue userBanEvent = LuaValue.tableOf();
+			userBanEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			userBanEvent.set("user", (new LuaUser(event.getUser())).getTable());
+			
+			Main.mLuaEnv.get("onUserBan").checkfunction().call(userBanEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserJoinEvent(UserJoinEvent event)
+	{
+		try
+		{
+			LuaValue userJoinEvent = LuaValue.tableOf();
+			userJoinEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			userJoinEvent.set("user", (new LuaUser(event.getUser())).getTable());
+			
+			Main.mLuaEnv.get("onUserJoin").checkfunction().call(userJoinEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserLeaveEvent(UserLeaveEvent event)
+	{
+		try
+		{
+			LuaValue userLeaveEvent = LuaValue.tableOf();
+			userLeaveEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			userLeaveEvent.set("user", (new LuaUser(event.getUser())).getTable());
+
+			Main.mLuaEnv.get("onUserLeave").checkfunction().call(userLeaveEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserPardonEvent(UserPardonEvent event)
+	{
+		try
+		{
+			LuaValue userPardonEvent = LuaValue.tableOf();
+			userPardonEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			userPardonEvent.set("user", (new LuaUser(event.getUser())).getTable());
+
+			Main.mLuaEnv.get("onUserPardon").checkfunction().call(userPardonEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserRoleUpdateEvent(UserRoleUpdateEvent event)
+	{
+		try
+		{
+			LuaValue userRoleUpdateEvent = LuaValue.tableOf();
+			userRoleUpdateEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+			userRoleUpdateEvent.set("user", (new LuaUser(event.getUser())).getTable());
+			
+			LuaValue luaOldRoles = LuaValue.tableOf();
+			List<IRole> oldRoles = event.getOldRoles();
+			for(int i = 0; i < oldRoles.size(); i++)
+			{
+				luaOldRoles.set(i+1, new LuaRole(oldRoles.get(i)).getTable());
+			}
+			userRoleUpdateEvent.set("oldRoles", luaOldRoles);
+			
+			LuaValue luaNewRoles = LuaValue.tableOf();
+			List<IRole> newRoles = event.getNewRoles();
+			for(int i = 0; i < newRoles.size(); i++)
+			{
+				luaNewRoles.set(i+1, new LuaRole(newRoles.get(i)).getTable());
+			}
+			userRoleUpdateEvent.set("newRoles", luaNewRoles);
+
+			Main.mLuaEnv.get("onUserRoleUpdate").checkfunction().call(userRoleUpdateEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserUpdateEvent(UserUpdateEvent event)
+	{
+		try
+		{
+			LuaValue userUpdateEvent = LuaValue.tableOf();
+			userUpdateEvent.set("old", new LuaUser(event.getOldUser()).getTable());
+			userUpdateEvent.set("new", new LuaUser(event.getNewUser()).getTable());
+			
+			Main.mLuaEnv.get("onUserUpdate").checkfunction().call(userUpdateEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserVoiceChannelJoinEvent(UserVoiceChannelJoinEvent event)
+	{
+		try
+		{
+			LuaValue userVoiceChannelEvent = LuaValue.tableOf();
+			userVoiceChannelEvent.set("user", new LuaUser(event.getUser()).getTable());
+			userVoiceChannelEvent.set("channel", new LuaVoiceChannel(event.getChannel()).getTable());
+			
+			Main.mLuaEnv.get("onUserVoiceChannelJoin").checkfunction().call(userVoiceChannelEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserVoiceChannelLeaveEvent(UserVoiceChannelLeaveEvent event)
+	{
+		try
+		{
+			LuaValue userVoiceChannelEvent = LuaValue.tableOf();
+			userVoiceChannelEvent.set("user", new LuaUser(event.getUser()).getTable());
+			userVoiceChannelEvent.set("channel", new LuaVoiceChannel(event.getChannel()).getTable());
+			
+			Main.mLuaEnv.get("onUserVoiceChannelJoin").checkfunction().call(userVoiceChannelEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserVoiceChannelMoveEvent(UserVoiceChannelMoveEvent event)
+	{
+		try
+		{
+			LuaValue userVoiceChannelEvent = LuaValue.tableOf();
+			userVoiceChannelEvent.set("user", new LuaUser(event.getUser()).getTable());
+			userVoiceChannelEvent.set("oldchannel", new LuaVoiceChannel(event.getOldChannel()).getTable());
+			userVoiceChannelEvent.set("newchannel", new LuaVoiceChannel(event.getNewChannel()).getTable());
+			
+			Main.mLuaEnv.get("onUserVoiceChannelJoin").checkfunction().call(userVoiceChannelEvent);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onUserVoiceStateUpdateEvent(UserVoiceStateUpdateEvent event)
+	{
+		try
+		{
+			// TODO: implement this
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onVoiceChannelCreateEvent(VoiceChannelCreateEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onVoiceChannelCreate").checkfunction().call(new LuaVoiceChannel(event.getChannel()).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onVoiceChannelDeleteEvent(VoiceChannelDeleteEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onVoiceChannelCreate").checkfunction().call(new LuaVoiceChannel(event.getVoiceChannel()).getTable());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onVoiceChannelUpdateEvent(VoiceChannelUpdateEvent event)
+	{
+		try
+		{
+			LuaValue voiceChannels = LuaValue.tableOf();
+			voiceChannels.set("old", new LuaVoiceChannel(event.getOldVoiceChannel()).getTable());
+			voiceChannels.set("new", new LuaVoiceChannel(event.getNewVoiceChannel()).getTable());
+			Main.mLuaEnv.get("onVoiceChannelCreate").checkfunction().call(voiceChannels);
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	@EventSubscriber
+	public void onVoiceDisconnectedEvent(VoiceDisconnectedEvent event)
+	{
+		try
+		{
+			Main.mLuaEnv.get("onVoiceChannelCreate").checkfunction().call(event.getReason().name());
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+		}
+	}
+	// VoicePingEvent not needed
+	@EventSubscriber
+	public void onVoiceUserSpeakingEvent(VoiceUserSpeakingEvent event)
+	{
+		try
+		{
+			
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+			Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 		}
 	}
 }
