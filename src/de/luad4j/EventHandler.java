@@ -527,7 +527,23 @@ public class EventHandler
 			} 
 		}
 	}
-	// ReadyEvent not needed
+	@EventSubscriber
+	public void onReadyEvent(ReadyEvent event)
+	{
+		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
+		{
+			try
+			{
+				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call();
+			}
+			catch (Exception e)
+			{
+				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+				Main.mDiscordClient.getDispatcher()
+						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			} 
+		}
+	}
 	@EventSubscriber
 	public void onRoleCreateEvent(RoleCreateEvent event)
 	{
