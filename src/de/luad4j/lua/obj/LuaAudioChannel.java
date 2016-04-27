@@ -211,7 +211,7 @@ public class LuaAudioChannel
 		
 		public LuaValue getTable()
 		{
-			return mLuaAudioChannel;
+			return mLuaAudioMetaData;
 		}
 	}
 	
