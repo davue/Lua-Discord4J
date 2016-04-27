@@ -35,7 +35,7 @@ public class LuaAudioChannel
 		
 		// Init Lua
 		mLuaAudioChannel = LuaValue.tableOf();
-		mLuaAudioChannel.set("ClearQueue", new ClearQueue());
+		mLuaAudioChannel.set("clearQueue", new ClearQueue());
 		mLuaAudioChannel.set("getAudioMetaData", new GetAudioMetaData());
 		mLuaAudioChannel.set("isPaused", new IsPaused());
 		mLuaAudioChannel.set("pause", new Pause());
