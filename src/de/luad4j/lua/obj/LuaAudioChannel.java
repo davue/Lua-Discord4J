@@ -37,6 +37,7 @@ public class LuaAudioChannel
 		mLuaAudioChannel = LuaValue.tableOf();
 		mLuaAudioChannel.set("clearQueue", new ClearQueue());
 		mLuaAudioChannel.set("getAudioMetaData", new GetAudioMetaData());
+		mLuaAudioChannel.set("getQueueSize", new GetQueueSize());
 		mLuaAudioChannel.set("isPaused", new IsPaused());
 		mLuaAudioChannel.set("pause", new Pause());
 		mLuaAudioChannel.set("queueFile", new QueueFile());
@@ -64,6 +65,15 @@ public class LuaAudioChannel
 		public LuaValue call()
 		{
 			return (new LuaAudioMetaData(mAudioChannel.getAudioData(0).metaData)).getTable();
+		}
+	}
+	
+	private class GetQueueSize extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaValue.valueOf(mAudioChannel.getQueueSize());
 		}
 	}
 	
