@@ -545,11 +545,11 @@ public class LuaChannel
 				
 				if (args.narg() == 1)
 				{
-					mChannel.sendFile(file);
+					return (new LuaMessage(mChannel.sendFile(file))).getTable();
 				}
 				else if(args.narg() > 1)
 				{
-					mChannel.sendFile(file, args.tojstring(2));
+					return (new LuaMessage(mChannel.sendFile(file, args.tojstring(2)))).getTable();
 				}
 			}
 			catch (NullPointerException | IOException | MissingPermissionsException | HTTP429Exception | DiscordException e)
@@ -571,11 +571,11 @@ public class LuaChannel
 			{
 				if (args.narg() == 1)
 				{
-					mChannel.sendMessage(args.tojstring(1));
+					return (new LuaMessage(mChannel.sendMessage(args.tojstring(1)))).getTable();
 				}
 				else if(args.narg() > 1)
 				{
-					mChannel.sendMessage(args.tojstring(1), args.toboolean(2));
+					return (new LuaMessage(mChannel.sendMessage(args.tojstring(1), args.toboolean(2)))).getTable();
 				}
 			}
 			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
