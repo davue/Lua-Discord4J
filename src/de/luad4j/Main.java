@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import de.luad4j.lua.func.SetTimer;
 import de.luad4j.lua.obj.LuaClient;
 import sx.blah.discord.api.ClientBuilder;
@@ -51,10 +49,6 @@ public class Main
 	{
 		if(args.length >= 4)
 		{	
-			// Set logger level to INFO
-			Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-			root.setLevel(Level.INFO);
-			
 			// Lua isn't initialized yet
 			mAlreadyInitialized = false;
 			

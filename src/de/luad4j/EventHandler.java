@@ -256,6 +256,7 @@ public class EventHandler
 	@EventSubscriber
 	public void onDiscordDisconnectedEvent(DiscordDisconnectedEvent event)
 	{
+		logger.debug("DiscordDisconnectedEvent: " + event.getReason());
 		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
 		{
 			try
@@ -530,6 +531,8 @@ public class EventHandler
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event)
 	{
+		logger.debug("ReadyEvent");
+		
 		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
 		{
 			try
