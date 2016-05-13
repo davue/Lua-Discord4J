@@ -23,6 +23,9 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import org.slf4j.LoggerFactory;
+
+import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import de.luad4j.lua.func.SetTimer;
@@ -36,6 +39,7 @@ public class Main
 {
 	public static IDiscordClient 			mDiscordClient;										// Client instance of current user
 	public static LuaClient					mLuaClient;											// Lua client instance
+	public static SteamWebApiClient			mSteamClient;										// Client instance of steam web API
 	public static Globals 					mLuaEnv = JsePlatform.standardGlobals();			// The main lua environment
 	public static boolean					mAlreadyInitialized;								// If lua has already been initialized
 	
@@ -59,24 +63,34 @@ public class Main
 			{
 				mLuaPath = args[3];
 				
-				ClientBuilder builder = new ClientBuilder();
-				builder.withLogin(args[1], args[2]);
-				
-				loginDiscord(builder);
+				try
+				{
+					ClientBuilder builder = new ClientBuilder();
+					builder.withLogin(args[1], args[2]).login();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error("Failed to login: " + e.getErrorMessage());
+				}
 			}
 			else if(args[0].equals("-bot")) // Login into Discord with bottoken
 			{
 				mLuaPath = args[2];
 				
-				ClientBuilder builder = new ClientBuilder();
-				builder.withToken(args[1]);
-				
-				loginDiscord(builder);
+				try
+				{
+					ClientBuilder builder = new ClientBuilder();
+					builder.withToken(args[1]).login();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error("Failed to login: " + e.getErrorMessage());
+				}
 			}
 			else // Print usage and exit
 			{
-				System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
-				System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
+				mLogger.info("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
+				mLogger.info("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
 				System.exit(0);
 			}
 
@@ -100,18 +114,6 @@ public class Main
 			System.out.println("Usage: java -jar Lua-Discord4J.jar -user <email> <password> <luamainfile> [port]");
 			System.out.println("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
 			System.exit(0);
-		}
-	}
-	
-	public static void loginDiscord(ClientBuilder builder)
-	{
-		try 
-		{
-			mDiscordClient = builder.login(); // Builds the IDiscordClient instance and logs it in
-		} 
-		catch (DiscordException e) 
-		{
-			mLogger.error("Failed to login: " + e.getErrorMessage());
 		}
 	}
 	
