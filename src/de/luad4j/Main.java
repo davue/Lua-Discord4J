@@ -24,8 +24,6 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 
 import org.slf4j.LoggerFactory;
 
-import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
-
 import de.luad4j.lua.func.SetTimer;
 import de.luad4j.lua.obj.LuaClient;
 import sx.blah.discord.api.ClientBuilder;
@@ -37,7 +35,6 @@ public class Main
 {
 	public static IDiscordClient 			mDiscordClient;										// Client instance of current user
 	public static LuaClient					mLuaClient;											// Lua client instance
-	public static SteamWebApiClient			mSteamClient;										// Client instance of steam web API
 	public static Globals 					mLuaEnv = JsePlatform.standardGlobals();			// The main lua environment
 	public static boolean					mAlreadyInitialized;								// If lua has already been initialized
 	
@@ -60,7 +57,7 @@ public class Main
 				try
 				{
 					ClientBuilder builder = new ClientBuilder();
-					builder.withLogin(args[1], args[2]).login();
+					mDiscordClient = builder.withLogin(args[1], args[2]).login();
 				}
 				catch (DiscordException e)
 				{
@@ -74,7 +71,7 @@ public class Main
 				try
 				{
 					ClientBuilder builder = new ClientBuilder();
-					builder.withToken(args[1]).login();
+					mDiscordClient = builder.withToken(args[1]).login();
 				}
 				catch (DiscordException e)
 				{
