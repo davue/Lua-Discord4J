@@ -496,7 +496,14 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue isIdle, LuaValue game)
 		{
-			mClient.updatePresence(isIdle.toboolean(), Optional.ofNullable(game.tojstring()));
+			if(game == LuaValue.NIL)
+			{
+				mClient.updatePresence(isIdle.toboolean(), Optional.empty());
+			}
+			else
+			{
+				mClient.updatePresence(isIdle.toboolean(), Optional.ofNullable(game.tojstring()));
+			}
 			return LuaValue.NIL;
 		}
 	}
