@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 	xmlns="http://maven.apache.org/POM/4.0.0" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	 
+	<groupId>de.luad4j</groupId>
+	<artifactId>lua-discord4j</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>Lua-Discord4J</name>
+	<description>A Lua wrapper for Discord4J</description>
+	<url>https://github.com/davue/Lua-Discord4J</url>
+	<licenses>
+		<license>
+			<name>GNU GPLv3 License</name>
+			<url>http://opensource.org/licenses/GPL-3.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<properties>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.github.austinv11</groupId>
+			<artifactId>Discord4j</artifactId>
+			<version>2.4.7</version>
+			<classifier>shaded</classifier>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.luaj</groupId>
+			<artifactId>luaj-jse</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.7</version>
+		</dependency>
+	</dependencies>
+  
+	<build>
+		<resources>
+			<resource>
+	            <directory>src/</directory>
+	            <includes>
+	                <include>logback.xml</include>
+	            </includes>
+	            <targetPath>.</targetPath>
+	        </resource>
+		</resources>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				
+				<configuration>
+					<transformers>
+						<transformer
+								implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>de.luad4j.Main</mainClass>
+						</transformer>
+					</transformers>
+					<artifactSet>
+						<excludes>
+							<exclude>org.slf4j:slf4j-simple</exclude>
+						</excludes>
+					</artifactSet>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<shadedClassifierName>shaded</shadedClassifierName>
+				</configuration>
+				
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+  
+	<repositories>
+		<repository> <!-- This repo fixes issues with transitive dependencies -->
+			<id>jcenter</id>
+			<url>http://jcenter.bintray.com</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+</project>
