@@ -36,6 +36,8 @@ import org.luaj.vm2.LuaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: implement wrapper for every event
+
 public class EventHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
