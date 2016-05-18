@@ -42,56 +42,48 @@ import sx.blah.discord.handle.obj.IRegion;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.Image;
+import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 // Client is a global lua table -> no getClient() lua implementation needed for other objects
 
 public class LuaClient
 {
-	private static IDiscordClient 	mClient; 	// Client object inside Java
-	private static LuaValue 		mLuaClient; // Table: Client object inside Lua
+	private static final IDiscordClient 	mClient = Main.mDiscordClient; 		// Client object inside Java
+	private static final LuaValue 			mLuaClient = LuaValue.tableOf(); 	// Table: Client object inside Lua
 	
 	private static final Logger mLogger = LoggerFactory.getLogger(LuaClient.class);	// Logger of this class
 
 	public LuaClient()
 	{
-		// Init only once
-		if (mClient == null)
-		{
-			mClient = Main.mDiscordClient;
-		}
-
-		if (mLuaClient == null)
-		{
-			// Init Lua
-			mLuaClient = LuaValue.tableOf();
-			mLuaClient.set("changeAvatar", new ChangeAvatar());
-			mLuaClient.set("changeEmail", new ChangeEmail());
-			mLuaClient.set("changePassword", new ChangePassword());
-			mLuaClient.set("changeUsername", new ChangeUsername());
-			mLuaClient.set("createGuild", new CreateGuild());
-			mLuaClient.set("getChannelByID", new GetChannelByID());
-			mLuaClient.set("getChannels", new GetChannels());
-			mLuaClient.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
-			mLuaClient.set("getGuildByID", new GetGuildByID());
-			mLuaClient.set("getGuilds", new GetGuilds());
-			mLuaClient.set("getInviteForCode", new GetInviteForCode());
-			mLuaClient.set("getLaunchTime", new GetLaunchTime());
-			mLuaClient.set("getOrCreatePMChannel", new GetOrCreatePMChannel());
-			mLuaClient.set("getOurUser", new GetOurUser());
-			mLuaClient.set("getRegionByID", new GetRegionByID());
-			mLuaClient.set("getRegions", new GetRegions());
-			mLuaClient.set("getResponseTime", new GetResponseTime());
-			mLuaClient.set("getToken", new GetToken());
-			mLuaClient.set("getUserByID", new GetUserByID());
-			mLuaClient.set("getVoiceChannelByID", new GetVoiceChannelByID());
-			mLuaClient.set("getVoiceChannels", new GetVoiceChannels());
-			mLuaClient.set("isBot", new IsBot());
-			mLuaClient.set("isReady", new IsReady());
-			mLuaClient.set("login", new Login());
-			mLuaClient.set("logout", new Logout());
-			mLuaClient.set("updatePresence", new UpdatePresence());
-		}
+		// Init Lua
+		mLuaClient.set("changeAvatar", new ChangeAvatar());
+		mLuaClient.set("changeEmail", new ChangeEmail());
+		mLuaClient.set("changePassword", new ChangePassword());
+		mLuaClient.set("changeUsername", new ChangeUsername());
+		mLuaClient.set("createGuild", new CreateGuild());
+		mLuaClient.set("getChannelByID", new GetChannelByID());
+		mLuaClient.set("getChannels", new GetChannels());
+		mLuaClient.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
+		mLuaClient.set("getGuildByID", new GetGuildByID());
+		mLuaClient.set("getGuilds", new GetGuilds());
+		mLuaClient.set("getInviteForCode", new GetInviteForCode());
+		mLuaClient.set("getLaunchTime", new GetLaunchTime());
+		mLuaClient.set("getOrCreatePMChannel", new GetOrCreatePMChannel());
+		mLuaClient.set("getOurUser", new GetOurUser());
+		mLuaClient.set("getRegionByID", new GetRegionByID());
+		mLuaClient.set("getRegions", new GetRegions());
+		mLuaClient.set("getResponseTime", new GetResponseTime());
+		mLuaClient.set("getToken", new GetToken());
+		mLuaClient.set("getUserByID", new GetUserByID());
+		mLuaClient.set("getVoiceChannelByID", new GetVoiceChannelByID());
+		mLuaClient.set("getVoiceChannels", new GetVoiceChannels());
+		mLuaClient.set("isBot", new IsBot());
+		mLuaClient.set("isReady", new IsReady());
+		mLuaClient.set("login", new Login());
+		mLuaClient.set("logout", new Logout());
+		mLuaClient.set("updatePresence", new UpdatePresence());
 	}
 
 	private static class ChangeAvatar extends OneArgFunction
@@ -99,25 +91,27 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue filepath)
 		{
-			try
-			{
-				if (filepath != LuaValue.NIL)
+			return RequestBuffer.request(() -> {
+				try
 				{
-					File file = new File(filepath.tojstring());
-					mClient.changeAvatar(Image.forFile(file));
+					if (filepath != LuaValue.NIL)
+					{
+						File file = new File(filepath.tojstring());
+						mClient.changeAvatar(Image.forFile(file));
+					}
+					else
+					{
+						mClient.changeAvatar(Image.defaultAvatar());
+					}
 				}
-				else
+				catch (DiscordException e)
 				{
-					mClient.changeAvatar(Image.defaultAvatar());
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 				}
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 
@@ -126,17 +120,19 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue email)
 		{
-			try
-			{
-				mClient.changeEmail(email.tojstring());
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mClient.changeEmail(email.tojstring());
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 
@@ -145,17 +141,19 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue password)
 		{
-			try
-			{
-				mClient.changePassword(password.tojstring());
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mClient.changePassword(password.tojstring());
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 
@@ -164,17 +162,19 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue username)
 		{
-			try
-			{
-				mClient.changeUsername(username.tojstring());
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mClient.changeUsername(username.tojstring());
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 
@@ -183,19 +183,21 @@ public class LuaClient
 		@Override
 		public LuaValue invoke(Varargs args)
 		{
-			try
-			{
-				File file = new File(args.tojstring(1));
-				IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)), Optional.ofNullable(Image.forFile(file)));
-				return (new LuaGuild(guild)).getTable();
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					File file = new File(args.tojstring(1));
+					IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)), Optional.ofNullable(Image.forFile(file)));
+					return (new LuaGuild(guild)).getTable();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 
@@ -316,17 +318,19 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			try
-			{
-				return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring())))).getTable();
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring())))).getTable();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -353,24 +357,26 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				List<IRegion> regions = mClient.getRegions();
-				
-				LuaValue luaRegions = LuaValue.tableOf();
-				for(IRegion region : regions)
+			return RequestBuffer.request(() -> {
+				try
 				{
-					luaRegions.set(luaRegions.length(), (new LuaRegion(region)).getTable());
+					List<IRegion> regions = mClient.getRegions();
+					
+					LuaValue luaRegions = LuaValue.tableOf();
+					for(IRegion region : regions)
+					{
+						luaRegions.set(luaRegions.length(), (new LuaRegion(region)).getTable());
+					}
+					return luaRegions;
 				}
-				return luaRegions;
-			}
-			catch (LuaError | DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				catch (LuaError | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -477,17 +483,19 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				mClient.logout();
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mClient.logout();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	

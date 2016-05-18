@@ -395,6 +395,8 @@ public class EventHandler
 			} 
 		}
 	}
+	
+	@SuppressWarnings("deprecation")
 	@EventSubscriber
 	public void onInviteReceivedEvent(InviteReceivedEvent event)
 	{

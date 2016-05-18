@@ -58,7 +58,6 @@ public class LuaAudioChannel
 		}
 	}
 	
-	// TODO: needs testing, not sure if this works
 	private class GetAudioMetaData extends ZeroArgFunction
 	{
 		@Override
