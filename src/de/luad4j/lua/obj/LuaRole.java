@@ -18,6 +18,7 @@
 
 package de.luad4j.lua.obj;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
@@ -33,6 +34,9 @@ import java.util.EnumSet;
 
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 
 public class LuaRole
 {
@@ -68,17 +72,19 @@ public class LuaRole
 		@Override
 		public LuaValue call(LuaValue color)
 		{
-			try
-			{
-				mRole.changeColor(Color.decode(color.tojstring()));
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mRole.changeColor(Color.decode(color.tojstring()));
+				}
+				catch (NumberFormatException | DiscordException | MissingPermissionsException e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -87,17 +93,19 @@ public class LuaRole
 		@Override
 		public LuaValue call(LuaValue hoist)
 		{
-			try
-			{
-				mRole.changeHoist(hoist.toboolean());
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mRole.changeHoist(hoist.toboolean());
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -106,17 +114,19 @@ public class LuaRole
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			try
-			{
-				mRole.changeName(name.tojstring());
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mRole.changeName(name.tojstring());
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -125,30 +135,32 @@ public class LuaRole
 		@Override
 		public LuaValue call(LuaValue luaPermissions)
 		{
-			try
-			{
-				// Parse permissions from lua to java
-				LuaValue k = LuaValue.NIL;
-				
-				EnumSet<Permissions> permissions = EnumSet.noneOf(Permissions.class);
-				while ( true ) 
+			return RequestBuffer.request(() -> {
+				try
 				{
-					Varargs n = luaPermissions.next(k);
-					if ( (k = n.arg1()).isnil() )
-						break;
-					LuaValue v = n.arg(2);
-					permissions.add(Permissions.valueOf(v.tojstring()));
+					// Parse permissions from lua to java
+					LuaValue k = LuaValue.NIL;
+					
+					EnumSet<Permissions> permissions = EnumSet.noneOf(Permissions.class);
+					while ( true ) 
+					{
+						Varargs n = luaPermissions.next(k);
+						if ( (k = n.arg1()).isnil() )
+							break;
+						LuaValue v = n.arg(2);
+						permissions.add(Permissions.valueOf(v.tojstring()));
+					}
+					
+					mRole.changePermissions(permissions);
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 				}
 				
-				mRole.changePermissions(permissions);
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -157,17 +169,19 @@ public class LuaRole
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				mRole.delete();
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mRole.delete();
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					logger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -233,7 +247,7 @@ public class LuaRole
 				
 				return luaPermissions;
 			}
-			catch (Exception e)
+			catch (LuaError e)
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));

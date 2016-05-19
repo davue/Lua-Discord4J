@@ -41,9 +41,9 @@ import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.Image;
 import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 
 public class LuaGuild
 {
@@ -102,24 +102,26 @@ public class LuaGuild
 	{
 		public LuaValue invoke(Varargs args)
 		{
-			try
-			{
-				if(args.isnumber(args.toint(2))) // If there are 2 arguments
+			return RequestBuffer.request(() -> {
+				try
 				{
-					mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)), args.toint(2));
+					if(args.isnumber(args.toint(2))) // If there are 2 arguments
+					{
+						mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)), args.toint(2));
+					}
+					else
+					{
+						mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)));
+					}
 				}
-				else
+				catch (MissingPermissionsException | DiscordException e)
 				{
-					mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)));
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 				}
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -128,17 +130,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			try
-			{
-				mGuild.changeAFKChannel(Optional.ofNullable(Main.mDiscordClient.getVoiceChannelByID(channelID.tojstring())));
-			}
-			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.changeAFKChannel(Optional.ofNullable(Main.mDiscordClient.getVoiceChannelByID(channelID.tojstring())));
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 
@@ -147,17 +151,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue timeout)
 		{
-			try
-			{
-				mGuild.changeAFKTimeout(timeout.toint());
-			}
-			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.changeAFKTimeout(timeout.toint());
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -166,18 +172,20 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue filepath)
 		{
-			File file = new File(filepath.tojstring(1));
-			try
-			{
-				mGuild.changeIcon(Optional.ofNullable(Image.forFile(file)));
-			}
-			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				File file = new File(filepath.tojstring(1));
+				try
+				{
+					mGuild.changeIcon(Optional.ofNullable(Image.forFile(file)));
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -186,17 +194,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			try
-			{
-				mGuild.changeName(name.tojstring());
-			}
-			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.changeName(name.tojstring());
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -205,17 +215,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue regionID)
 		{
-			try
-			{
-				mGuild.changeRegion(Main.mDiscordClient.getRegionByID(regionID.tojstring()));
-			}
-			catch (HTTP429Exception | DiscordException | MissingPermissionsException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.changeRegion(Main.mDiscordClient.getRegionByID(regionID.tojstring()));
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -224,17 +236,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			try
-			{
-				return (new LuaChannel(mGuild.createChannel(name.tojstring()))).getTable();
-			}
-			catch (DiscordException | MissingPermissionsException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaChannel(mGuild.createChannel(name.tojstring()))).getTable();
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -243,17 +257,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				return (new LuaRole(mGuild.createRole())).getTable();
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaRole(mGuild.createRole())).getTable();
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
 
-			return LuaValue.NIL;
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -262,17 +278,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			try
-			{
-				return (new LuaVoiceChannel(mGuild.createVoiceChannel(name.tojstring()))).getTable();
-			}
-			catch (DiscordException | MissingPermissionsException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaVoiceChannel(mGuild.createVoiceChannel(name.tojstring()))).getTable();
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -281,17 +299,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				mGuild.deleteGuild();
-			}
-			catch (DiscordException | HTTP429Exception | MissingPermissionsException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.deleteGuild();
+				}
+				catch (DiscordException | MissingPermissionsException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -300,23 +320,25 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID, LuaValue roleIDTable)
 		{
-			IRole[] roles = new IRole[roleIDTable.length()];
-			for(int i = 1; i < roleIDTable.length(); i++)
-			{
-				roles[i-1] = mGuild.getRoleByID(roleIDTable.get(i).tojstring());
-			}
-			
-			try
-			{
-				mGuild.editUserRoles(Main.mDiscordClient.getUserByID(userID.tojstring()), roles);
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					IRole[] roles = new IRole[roleIDTable.length()];
+					for(int i = 1; i < roleIDTable.length(); i++)
+					{
+						roles[i-1] = mGuild.getRoleByID(roleIDTable.get(i).tojstring());
+					}
+					
+					mGuild.editUserRoles(Main.mDiscordClient.getUserByID(userID.tojstring()), roles);
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -362,25 +384,27 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			List<IUser> bannedUsers;
-			try
-			{
-				bannedUsers = mGuild.getBannedUsers();
-				LuaValue luaBannedUsers = LuaValue.tableOf();
-				for(IUser user : bannedUsers)
+			return RequestBuffer.request(() -> {
+				try
 				{
-					luaBannedUsers.set(luaBannedUsers.length()+1, (new LuaUser(user)).getTable());
+					List<IUser> bannedUsers;
+					bannedUsers = mGuild.getBannedUsers();
+					LuaValue luaBannedUsers = LuaValue.tableOf();
+					for(IUser user : bannedUsers)
+					{
+						luaBannedUsers.set(luaBannedUsers.length()+1, (new LuaUser(user)).getTable());
+					}
+					
+					return luaBannedUsers;
+				}
+				catch (LuaError | DiscordException e )
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 				}
 				
-				return luaBannedUsers;
-			}
-			catch (LuaError | HTTP429Exception | DiscordException e )
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -469,24 +493,26 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				List<IInvite> invites = mGuild.getInvites();
-				LuaValue luaInvites = LuaValue.tableOf();
-				for(IInvite invite : invites)
+			return RequestBuffer.request(() -> {
+				try
 				{
-					luaInvites.set(luaInvites.length()+1, (new LuaInvite(invite)).getTable());
+					List<IInvite> invites = mGuild.getInvites();
+					LuaValue luaInvites = LuaValue.tableOf();
+					for(IInvite invite : invites)
+					{
+						luaInvites.set(luaInvites.length()+1, (new LuaInvite(invite)).getTable());
+					}
+					
+					return luaInvites;
+				}
+				catch (LuaError | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
 				}
 				
-				return luaInvites;
-			}
-			catch (LuaError | DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -601,17 +627,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue days)
 		{
-			try
-			{
-				return LuaValue.valueOf(mGuild.getUsersToBePruned(days.toint()));
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return LuaValue.valueOf(mGuild.getUsersToBePruned(days.toint()));
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -655,17 +683,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			try
-			{
-				mGuild.kickUser(Main.mDiscordClient.getUserByID(userID.tojstring()));
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.kickUser(Main.mDiscordClient.getUserByID(userID.tojstring()));
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -674,17 +704,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				mGuild.leaveGuild();
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.leaveGuild();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -693,17 +725,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			try
-			{
-				mGuild.pardonUser(userID.tojstring());
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.pardonUser(userID.tojstring());
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -712,17 +746,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue days)
 		{
-			try
-			{
-				mGuild.pruneUsers(days.toint());
-			}
-			catch (DiscordException | HTTP429Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.pruneUsers(days.toint());
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -733,17 +769,19 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			try
-			{
-				mGuild.transferOwnership(Main.mDiscordClient.getUserByID(userID.tojstring()));
-			}
-			catch (HTTP429Exception | MissingPermissionsException | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mGuild.transferOwnership(Main.mDiscordClient.getUserByID(userID.tojstring()));
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	

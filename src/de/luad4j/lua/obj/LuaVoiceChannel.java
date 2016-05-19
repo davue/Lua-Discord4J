@@ -24,6 +24,7 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import de.luad4j.Main;
 import de.luad4j.events.JavaErrorEvent;
 import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.util.DiscordException;
 
 public class LuaVoiceChannel extends LuaChannel
 {	
@@ -51,7 +52,7 @@ public class LuaVoiceChannel extends LuaChannel
 			{
 				return (new LuaAudioChannel(mVoiceChannel.getAudioChannel())).getTable();
 			}
-			catch (Exception e)
+			catch (DiscordException e)
 			{
 				mLogger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));

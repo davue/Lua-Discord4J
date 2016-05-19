@@ -32,8 +32,8 @@ import de.luad4j.events.JavaErrorEvent;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 
 public class LuaMessage 
 {
@@ -69,17 +69,19 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			try
-			{
-				mMessage.delete();
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mMessage.delete();
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -88,17 +90,19 @@ public class LuaMessage
 		@Override
 		public LuaValue call(LuaValue content) 
 		{
-			try
-			{
-				return (new LuaMessage(mMessage.edit(content.tojstring()))).getTable();
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaMessage(mMessage.edit(content.tojstring()))).getTable();
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -246,17 +250,19 @@ public class LuaMessage
 		@Override
 		public LuaValue call(LuaValue content) 
 		{
-			try
-			{
-				mMessage.reply(content.tojstring());
-			}
-			catch (MissingPermissionsException | HTTP429Exception | DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mMessage.reply(content.tojstring());
+				}
+				catch (MissingPermissionsException | DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	

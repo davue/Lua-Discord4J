@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import de.luad4j.Main;
 import de.luad4j.events.JavaErrorEvent;
 import sx.blah.discord.handle.obj.IInvite;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.RequestBuffer;
 
 public class LuaInvite
 {
@@ -52,17 +54,19 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				return (new LuaInviteResponse(mInvite.accept())).getTable();
-			}
-			catch (Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaInviteResponse(mInvite.accept())).getTable();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -71,17 +75,19 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				mInvite.delete();
-			}
-			catch (Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					mInvite.delete();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
@@ -90,17 +96,19 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
-				return (new LuaInviteResponse(mInvite.details())).getTable();
-			}
-			catch (Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			return RequestBuffer.request(() -> {
+				try
+				{
+					return (new LuaInviteResponse(mInvite.details())).getTable();
+				}
+				catch (DiscordException e)
+				{
+					mLogger.error(e.getMessage());
+					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+				}
+				
+				return LuaValue.NIL;
+			}).get();
 		}
 	}
 	
