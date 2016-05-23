@@ -21,6 +21,7 @@ package de.luad4j.lua.obj;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IRegion;
 
 public class LuaRegion
@@ -44,7 +45,9 @@ public class LuaRegion
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mRegion.getID());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mRegion.getID());
+			});
 		}
 	}
 	
@@ -53,7 +56,9 @@ public class LuaRegion
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mRegion.getName());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mRegion.getName());
+			});
 		}
 	}
 	
@@ -62,7 +67,9 @@ public class LuaRegion
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mRegion.isVIPOnly());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mRegion.isVIPOnly());
+			});
 		}
 	}
 	

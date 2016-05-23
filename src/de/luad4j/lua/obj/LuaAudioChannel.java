@@ -22,6 +22,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.AudioChannel;
 
 public class LuaAudioChannel
@@ -53,8 +54,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			mAudioChannel.clearQueue();
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.clearQueue();
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -63,7 +66,9 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			return (new LuaAudioMetaData(mAudioChannel.getAudioData(0).metaData)).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaAudioMetaData(mAudioChannel.getAudioData(0).metaData)).getTable();
+			});
 		}
 	}
 	
@@ -72,7 +77,9 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mAudioChannel.getQueueSize());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mAudioChannel.getQueueSize());
+			});
 		}
 	}
 	
@@ -81,7 +88,9 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mAudioChannel.isPaused());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mAudioChannel.isPaused());
+			});
 		}
 	}
 	
@@ -90,8 +99,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			mAudioChannel.pause();
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.pause();
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -100,8 +111,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call(LuaValue filePath)
 		{
-			mAudioChannel.queueFile(filePath.tojstring());
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.queueFile(filePath.tojstring());
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -110,8 +123,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call(LuaValue url)
 		{
-			mAudioChannel.queueUrl(url.tojstring());
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.queueUrl(url.tojstring());
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -120,8 +135,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			mAudioChannel.resume();
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.resume();
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -130,8 +147,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call(LuaValue volume)
 		{
-			mAudioChannel.setVolume(volume.tofloat());
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.setVolume(volume.tofloat());
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -140,8 +159,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call()
 		{
-			mAudioChannel.skip();
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.skip();
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -150,8 +171,10 @@ public class LuaAudioChannel
 		@Override
 		public LuaValue call(LuaValue index)
 		{
-			mAudioChannel.unqueue(index.toint());
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mAudioChannel.unqueue(index.toint());
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -178,7 +201,9 @@ public class LuaAudioChannel
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mAudioMetaData.channels);
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mAudioMetaData.channels);
+				});
 			}
 		}
 		
@@ -187,7 +212,9 @@ public class LuaAudioChannel
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mAudioMetaData.fileSource.getAbsolutePath());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mAudioMetaData.fileSource.getAbsolutePath());
+				});
 			}
 		}
 		
@@ -196,7 +223,9 @@ public class LuaAudioChannel
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mAudioMetaData.format.toString());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mAudioMetaData.format.toString());
+				});
 			}
 		}
 		
@@ -205,7 +234,9 @@ public class LuaAudioChannel
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mAudioMetaData.startedReading);
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mAudioMetaData.startedReading);
+				});
 			}
 		}
 		
@@ -214,7 +245,9 @@ public class LuaAudioChannel
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mAudioMetaData.urlSource.toExternalForm());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mAudioMetaData.urlSource.toExternalForm());
+				});
 			}
 		}
 		

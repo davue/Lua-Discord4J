@@ -20,21 +20,13 @@ package de.luad4j.lua.obj;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.luad4j.Main;
-import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IInvite;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.RequestBuffer;
 
 public class LuaInvite
 {
 	private final IInvite 	mInvite;	// Invite Object inside Java
 	private final LuaValue	mLuaInvite;	// Lua implementation of Invite
-	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaInvite.class);	// Logger of this class
 	
 	public LuaInvite(IInvite invite)
 	{
@@ -54,19 +46,9 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaInviteResponse(mInvite.accept())).getTable();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaInviteResponse(mInvite.accept())).getTable();
+			});
 		}
 	}
 	
@@ -75,19 +57,10 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mInvite.delete();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mInvite.delete();
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -96,19 +69,9 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaInviteResponse(mInvite.details())).getTable();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaInviteResponse(mInvite.details())).getTable();
+			});
 		}
 	}
 	
@@ -117,7 +80,9 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mInvite.getInviteCode());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mInvite.getInviteCode());
+			});
 		}
 	}
 	
@@ -126,7 +91,9 @@ public class LuaInvite
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mInvite.getXkcdPass());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mInvite.getXkcdPass());
+			});
 		}
 	}
 	
@@ -152,7 +119,9 @@ public class LuaInvite
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mInviteResponse.getChannelID());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mInviteResponse.getChannelID());
+				});
 			}
 		}
 		
@@ -161,7 +130,9 @@ public class LuaInvite
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mInviteResponse.getChannelName());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mInviteResponse.getChannelName());
+				});
 			}
 		}
 		
@@ -170,7 +141,9 @@ public class LuaInvite
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mInviteResponse.getGuildID());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mInviteResponse.getGuildID());
+				});
 			}
 		}
 		
@@ -179,7 +152,9 @@ public class LuaInvite
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mInviteResponse.getGuildName());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mInviteResponse.getGuildName());
+				});
 			}
 		}
 		

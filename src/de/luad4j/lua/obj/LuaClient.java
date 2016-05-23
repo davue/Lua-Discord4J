@@ -23,25 +23,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import de.luad4j.Main;
-import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRegion;
-import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.Image;
-import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 // Client is a global lua table -> no getClient() lua implementation needed for other objects
@@ -51,8 +46,6 @@ public class LuaClient
 	private static final IDiscordClient 	mClient = Main.mDiscordClient; 		// Client object inside Java
 	private static final LuaValue 			mLuaClient = LuaValue.tableOf(); 	// Table: Client object inside Lua
 	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaClient.class);	// Logger of this class
-
 	public LuaClient()
 	{
 		// Init Lua
@@ -89,27 +82,18 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue filepath)
 		{
-			return RequestBuffer.request(() -> {
-				try
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				if (filepath != LuaValue.NIL)
 				{
-					if (filepath != LuaValue.NIL)
-					{
-						File file = new File(filepath.tojstring());
-						mClient.changeAvatar(Image.forFile(file));
-					}
-					else
-					{
-						mClient.changeAvatar(Image.defaultAvatar());
-					}
+					File file = new File(filepath.tojstring());
+					mClient.changeAvatar(Image.forFile(file));
 				}
-				catch (DiscordException e)
+				else
 				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+					mClient.changeAvatar(Image.defaultAvatar());
+				} 
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 
@@ -118,19 +102,10 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue email)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mClient.changeEmail(email.tojstring());
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changeEmail(email.tojstring());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 
@@ -139,19 +114,10 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue password)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mClient.changePassword(password.tojstring());
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changePassword(password.tojstring());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 
@@ -160,19 +126,10 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue username)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mClient.changeUsername(username.tojstring());
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changeUsername(username.tojstring());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 
@@ -181,21 +138,12 @@ public class LuaClient
 		@Override
 		public LuaValue invoke(Varargs args)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					File file = new File(args.tojstring(1));
-					IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)), Optional.ofNullable(Image.forFile(file)));
-					return (new LuaGuild(guild)).getTable();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				File file = new File(args.tojstring(1));
+				IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)),
+						Optional.ofNullable(Image.forFile(file)));
+				return (new LuaGuild(guild)).getTable();
+			});
 		}
 	}
 
@@ -204,7 +152,9 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			return (new LuaChannel(mClient.getChannelByID(channelID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaChannel(mClient.getChannelByID(channelID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -213,24 +163,15 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue includePrivate)
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				Collection<IChannel> channels = mClient.getChannels(includePrivate.toboolean());
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IChannel channel : channels)
+				for (IChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, new LuaChannel(channel).getTable());
+					luaChannels.set(luaChannels.length() + 1, new LuaChannel(channel).getTable());
 				}
-				
 				return luaChannels;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -239,23 +180,15 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IVoiceChannel> channels = mClient.getConnectedVoiceChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IVoiceChannel channel : channels)
+				for (IVoiceChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, (new LuaVoiceChannel(channel)).getTable());
+					luaChannels.set(luaChannels.length() + 1, (new LuaVoiceChannel(channel)).getTable());
 				}
 				return luaChannels;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -264,7 +197,9 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue guildID)
 		{
-			return (new LuaGuild(mClient.getGuildByID(guildID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaGuild(mClient.getGuildByID(guildID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -273,23 +208,15 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IGuild> guilds = mClient.getGuilds();
 				LuaValue luaGuilds = LuaValue.tableOf();
-				for(IGuild guild : guilds)
+				for (IGuild guild : guilds)
 				{
-					luaGuilds.set(luaGuilds.length()+1, new LuaGuild(guild).getTable());
+					luaGuilds.set(luaGuilds.length() + 1, new LuaGuild(guild).getTable());
 				}
 				return luaGuilds;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -298,7 +225,9 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue code)
 		{
-			return (new LuaInvite(mClient.getInviteForCode(code.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaInvite(mClient.getInviteForCode(code.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -307,7 +236,9 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mClient.getLaunchTime().toString());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mClient.getLaunchTime().toString());
+			});
 		}
 	}
 
@@ -316,19 +247,10 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring())))).getTable();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaPrivateChannel(mClient.getOrCreatePMChannel(mClient.getUserByID(userID.tojstring()))))
+						.getTable();
+			});
 		}
 	}
 	
@@ -337,7 +259,9 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return (new LuaUser(mClient.getOurUser())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaUser(mClient.getOurUser())).getTable();
+			});
 		}
 	}
 	
@@ -346,7 +270,9 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue regionID)
 		{
-			return (new LuaRegion(mClient.getRegionByID(regionID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaRegion(mClient.getRegionByID(regionID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -355,26 +281,15 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				List<IRegion> regions = mClient.getRegions();
+				LuaValue luaRegions = LuaValue.tableOf();
+				for (IRegion region : regions)
 				{
-					List<IRegion> regions = mClient.getRegions();
-					
-					LuaValue luaRegions = LuaValue.tableOf();
-					for(IRegion region : regions)
-					{
-						luaRegions.set(luaRegions.length(), (new LuaRegion(region)).getTable());
-					}
-					return luaRegions;
+					luaRegions.set(luaRegions.length(), (new LuaRegion(region)).getTable());
 				}
-				catch (LuaError | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+				return luaRegions;
+			});
 		}
 	}
 	
@@ -383,7 +298,9 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mClient.getResponseTime());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mClient.getResponseTime());
+			});
 		}
 	}
 	
@@ -392,7 +309,9 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mClient.getToken());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mClient.getToken());
+			});
 		}
 	}
 	
@@ -401,7 +320,9 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			return (new LuaUser(mClient.getUserByID(userID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaUser(mClient.getUserByID(userID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -410,7 +331,9 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			return (new LuaVoiceChannel(mClient.getVoiceChannelByID(channelID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaVoiceChannel(mClient.getVoiceChannelByID(channelID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -419,23 +342,15 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				Collection<IVoiceChannel> channels = mClient.getVoiceChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IVoiceChannel channel : channels)
+				for (IVoiceChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, (new LuaVoiceChannel(channel)).getTable());
+					luaChannels.set(luaChannels.length() + 1, (new LuaVoiceChannel(channel)).getTable());
 				}
 				return luaChannels;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -444,7 +359,9 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mClient.isBot());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mClient.isBot());
+			});
 		}
 	}
 	
@@ -453,7 +370,9 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mClient.isReady());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mClient.isReady());
+			});
 		}
 	}
 	
@@ -462,17 +381,10 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				mClient.login();
-			}
-			catch (DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -481,19 +393,10 @@ public class LuaClient
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mClient.logout();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.logout();
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -502,15 +405,17 @@ public class LuaClient
 		@Override
 		public LuaValue call(LuaValue isIdle, LuaValue game)
 		{
-			if(game == LuaValue.NIL)
-			{
-				mClient.updatePresence(isIdle.toboolean(), Optional.empty());
-			}
-			else
-			{
-				mClient.updatePresence(isIdle.toboolean(), Optional.ofNullable(game.tojstring()));
-			}
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				if (game == LuaValue.NIL)
+				{
+					mClient.updatePresence(isIdle.toboolean(), Optional.empty());
+				}
+				else
+				{
+					mClient.updatePresence(isIdle.toboolean(), Optional.ofNullable(game.tojstring()));
+				}
+				return LuaValue.NIL;
+			});
 		}
 	}
 

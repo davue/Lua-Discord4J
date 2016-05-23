@@ -22,35 +22,26 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.luad4j.Main;
-import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IInvite;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.Image;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RequestBuffer;
 
 public class LuaGuild
 {
 	private final IGuild	mGuild;		// Guild object inside Java
 	private final LuaValue 	mLuaGuild;	// Lua implementation of Guild
-	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaGuild.class);	// Logger of this class
 	
 	public LuaGuild(IGuild guild)
 	{
@@ -102,26 +93,17 @@ public class LuaGuild
 	{
 		public LuaValue invoke(Varargs args)
 		{
-			return RequestBuffer.request(() -> {
-				try
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				if (args.isnumber(args.toint(2))) // If there are 2 arguments
 				{
-					if(args.isnumber(args.toint(2))) // If there are 2 arguments
-					{
-						mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)), args.toint(2));
-					}
-					else
-					{
-						mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)));
-					}
+					mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)), args.toint(2));
 				}
-				catch (MissingPermissionsException | DiscordException e)
+				else
 				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+					mGuild.banUser(Main.mDiscordClient.getUserByID(args.tojstring(1)));
 				}
-				
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -130,19 +112,11 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.changeAFKChannel(Optional.ofNullable(Main.mDiscordClient.getVoiceChannelByID(channelID.tojstring())));
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.changeAFKChannel(
+						Optional.ofNullable(Main.mDiscordClient.getVoiceChannelByID(channelID.tojstring())));
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 
@@ -151,19 +125,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue timeout)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.changeAFKTimeout(timeout.toint());
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.changeAFKTimeout(timeout.toint());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -172,20 +137,11 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue filepath)
 		{
-			return RequestBuffer.request(() -> {
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
 				File file = new File(filepath.tojstring(1));
-				try
-				{
-					mGuild.changeIcon(Optional.ofNullable(Image.forFile(file)));
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+				mGuild.changeIcon(Optional.ofNullable(Image.forFile(file)));
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -194,19 +150,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.changeName(name.tojstring());
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.changeName(name.tojstring());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -215,19 +162,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue regionID)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.changeRegion(Main.mDiscordClient.getRegionByID(regionID.tojstring()));
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.changeRegion(Main.mDiscordClient.getRegionByID(regionID.tojstring()));
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -236,19 +174,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaChannel(mGuild.createChannel(name.tojstring()))).getTable();
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaChannel(mGuild.createChannel(name.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -257,19 +185,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaRole(mGuild.createRole())).getTable();
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaRole(mGuild.createRole())).getTable();
+			});
 		}
 	}
 	
@@ -278,19 +196,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue name)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaVoiceChannel(mGuild.createVoiceChannel(name.tojstring()))).getTable();
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaVoiceChannel(mGuild.createVoiceChannel(name.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -299,19 +207,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.deleteGuild();
-				}
-				catch (DiscordException | MissingPermissionsException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.deleteGuild();
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -320,25 +219,15 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID, LuaValue roleIDTable)
 		{
-			return RequestBuffer.request(() -> {
-				try
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				IRole[] roles = new IRole[roleIDTable.length()];
+				for (int i = 1; i < roleIDTable.length(); i++)
 				{
-					IRole[] roles = new IRole[roleIDTable.length()];
-					for(int i = 1; i < roleIDTable.length(); i++)
-					{
-						roles[i-1] = mGuild.getRoleByID(roleIDTable.get(i).tojstring());
-					}
-					
-					mGuild.editUserRoles(Main.mDiscordClient.getUserByID(userID.tojstring()), roles);
+					roles[i - 1] = mGuild.getRoleByID(roleIDTable.get(i).tojstring());
 				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+				mGuild.editUserRoles(Main.mDiscordClient.getUserByID(userID.tojstring()), roles);
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -347,7 +236,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return (new LuaChannel(mGuild.getAFKChannel())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaChannel(mGuild.getAFKChannel())).getTable();
+			});
 		}
 	}
 	
@@ -356,7 +247,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mGuild.getAFKTimeout());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getAFKTimeout());
+			});
 		}
 	}
 	
@@ -365,17 +258,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				return (new LuaAudioChannel(mGuild.getAudioChannel())).getTable();
-			}
-			catch(DiscordException e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -384,27 +269,16 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				List<IUser> bannedUsers;
+				bannedUsers = mGuild.getBannedUsers();
+				LuaValue luaBannedUsers = LuaValue.tableOf();
+				for (IUser user : bannedUsers)
 				{
-					List<IUser> bannedUsers;
-					bannedUsers = mGuild.getBannedUsers();
-					LuaValue luaBannedUsers = LuaValue.tableOf();
-					for(IUser user : bannedUsers)
-					{
-						luaBannedUsers.set(luaBannedUsers.length()+1, (new LuaUser(user)).getTable());
-					}
-					
-					return luaBannedUsers;
+					luaBannedUsers.set(luaBannedUsers.length() + 1, (new LuaUser(user)).getTable());
 				}
-				catch (LuaError | DiscordException e )
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+				return luaBannedUsers;
+			});
 		}
 	}
 	
@@ -413,7 +287,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			return (new LuaChannel(mGuild.getChannelByID(channelID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaChannel(mGuild.getChannelByID(channelID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -422,24 +298,15 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IChannel> channels = mGuild.getChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IChannel channel : channels)
+				for (IChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, (new LuaChannel(channel)).getTable());
+					luaChannels.set(luaChannels.length() + 1, (new LuaChannel(channel)).getTable());
 				}
-				
 				return luaChannels;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -448,7 +315,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mGuild.getCreationDate().toString());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getCreationDate().toString());
+			});
 		}
 	}
 	
@@ -457,7 +326,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return (new LuaRole(mGuild.getEveryoneRole())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaRole(mGuild.getEveryoneRole())).getTable();
+			});
 		}
 	}
 	
@@ -466,7 +337,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mGuild.getIcon());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getIcon());
+			});
 		}
 	}
 	
@@ -475,7 +348,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mGuild.getIconURL());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getIconURL());
+			});
 		}
 	}
 	
@@ -484,7 +359,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mGuild.getID());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getID());
+			});
 		}
 	}
 	
@@ -493,26 +370,15 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				List<IInvite> invites = mGuild.getInvites();
+				LuaValue luaInvites = LuaValue.tableOf();
+				for (IInvite invite : invites)
 				{
-					List<IInvite> invites = mGuild.getInvites();
-					LuaValue luaInvites = LuaValue.tableOf();
-					for(IInvite invite : invites)
-					{
-						luaInvites.set(luaInvites.length()+1, (new LuaInvite(invite)).getTable());
-					}
-					
-					return luaInvites;
+					luaInvites.set(luaInvites.length() + 1, (new LuaInvite(invite)).getTable());
 				}
-				catch (LuaError | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+				return luaInvites;
+			});
 		}
 	}
 	
@@ -521,7 +387,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mGuild.getName());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getName());
+			});
 		}
 	}
 	
@@ -530,7 +398,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call() 
 		{
-			return (new LuaUser(mGuild.getOwner())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaUser(mGuild.getOwner())).getTable();
+			});
 		}
 	}
 	
@@ -539,7 +409,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mGuild.getOwnerID());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getOwnerID());
+			});
 		}
 	}
 	
@@ -548,7 +420,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return (new LuaRegion(mGuild.getRegion())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaRegion(mGuild.getRegion())).getTable();
+			});
 		}
 	}
 	
@@ -557,7 +431,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue roleID)
 		{
-			return (new LuaRole(mGuild.getRoleByID(roleID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaRole(mGuild.getRoleByID(roleID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -566,24 +442,15 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IRole> roles = mGuild.getRoles();
 				LuaValue luaRoles = LuaValue.tableOf();
-				for(IRole role : roles)
+				for (IRole role : roles)
 				{
-					luaRoles.set(luaRoles.length()+1, (new LuaRole(role)).getTable());
+					luaRoles.set(luaRoles.length() + 1, (new LuaRole(role)).getTable());
 				}
-				
 				return luaRoles;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -592,7 +459,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue roleID)
 		{
-			return (new LuaUser(mGuild.getUserByID(roleID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaUser(mGuild.getUserByID(roleID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -601,24 +470,15 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IUser> users = mGuild.getUsers();
 				LuaValue luaUsers = LuaValue.tableOf();
-				for(IUser user : users)
+				for (IUser user : users)
 				{
-					luaUsers.set(luaUsers.length()+1, (new LuaUser(user)).getTable());
+					luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
 				}
-				
 				return luaUsers;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -627,19 +487,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue days)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return LuaValue.valueOf(mGuild.getUsersToBePruned(days.toint()));
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mGuild.getUsersToBePruned(days.toint()));
+			});
 		}
 	}
 	
@@ -648,7 +498,9 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue channelID)
 		{
-			return (new LuaVoiceChannel(mGuild.getVoiceChannelByID(channelID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaVoiceChannel(mGuild.getVoiceChannelByID(channelID.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -657,24 +509,15 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IVoiceChannel> channels = mGuild.getVoiceChannels();
 				LuaValue luaChannels = LuaValue.tableOf();
-				for(IVoiceChannel channel : channels)
+				for (IVoiceChannel channel : channels)
 				{
-					luaChannels.set(luaChannels.length()+1, (new LuaVoiceChannel(channel)).getTable());
+					luaChannels.set(luaChannels.length() + 1, (new LuaVoiceChannel(channel)).getTable());
 				}
-				
 				return luaChannels;
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -683,19 +526,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.kickUser(Main.mDiscordClient.getUserByID(userID.tojstring()));
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.kickUser(Main.mDiscordClient.getUserByID(userID.tojstring()));
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -704,19 +538,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call()
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.leaveGuild();
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.leaveGuild();
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -725,19 +550,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.pardonUser(userID.tojstring());
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.pardonUser(userID.tojstring());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -746,19 +562,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue days)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.pruneUsers(days.toint());
-				}
-				catch (DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.pruneUsers(days.toint());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -769,19 +576,10 @@ public class LuaGuild
 		@Override
 		public LuaValue call(LuaValue userID)
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mGuild.transferOwnership(Main.mDiscordClient.getUserByID(userID.tojstring()));
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.transferOwnership(Main.mDiscordClient.getUserByID(userID.tojstring()));
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	

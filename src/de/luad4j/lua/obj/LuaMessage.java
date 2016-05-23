@@ -20,27 +20,17 @@ package de.luad4j.lua.obj;
 
 import java.util.List;
 
-import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.luad4j.Main;
-import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RequestBuffer;
 
 public class LuaMessage 
 {
 	private final IMessage 	mMessage;		// Message object inside Java
 	private final LuaValue 	mLuaMessage;	// Table: Message object inside Lua
-	
-	private static final Logger mLogger = LoggerFactory.getLogger(LuaMessage.class);	// Logger of this class
 	
 	public LuaMessage(IMessage message)
 	{
@@ -69,19 +59,10 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mMessage.delete();
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mMessage.delete();
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -90,19 +71,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call(LuaValue content) 
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					return (new LuaMessage(mMessage.edit(content.tojstring()))).getTable();
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
-				return LuaValue.NIL;
-			}).get();
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				return (new LuaMessage(mMessage.edit(content.tojstring()))).getTable();
+			});
 		}
 	}
 	
@@ -111,25 +82,16 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IMessage.Attachment> messageAttachments = mMessage.getAttachments();
 				LuaValue luaMessageAttachments = LuaValue.tableOf();
-				
 				for (IMessage.Attachment attachment : messageAttachments)
 				{
-					luaMessageAttachments.set(luaMessageAttachments.length()+1, (new LuaAttachment(attachment)).getTable());
+					luaMessageAttachments.set(luaMessageAttachments.length() + 1,
+							(new LuaAttachment(attachment)).getTable());
 				}
-				
 				return luaMessageAttachments;
-			}
-			catch (LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -138,7 +100,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return (new LuaUser(mMessage.getAuthor())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaUser(mMessage.getAuthor())).getTable();
+			});
 		}
 	}
 
@@ -147,7 +111,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return (new LuaChannel(mMessage.getChannel())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaChannel(mMessage.getChannel())).getTable();
+			});
 		}
 	}
 	
@@ -158,7 +124,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mMessage.getContent());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mMessage.getContent());
+			});
 		}
 	}
 	
@@ -167,7 +135,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mMessage.getCreationDate().toString());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mMessage.getCreationDate().toString());
+			});
 		}
 	}
 	
@@ -176,12 +146,13 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			if(mMessage.getEditedTimestamp().isPresent())
-			{
-				return LuaValue.valueOf(mMessage.getEditedTimestamp().get().toString());
-			}
-			
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				if (mMessage.getEditedTimestamp().isPresent())
+				{
+					return LuaValue.valueOf(mMessage.getEditedTimestamp().get().toString());
+				}
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -190,7 +161,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return (new LuaGuild(mMessage.getGuild())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaGuild(mMessage.getGuild())).getTable();
+			});
 		}
 	}
 	
@@ -199,7 +172,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mMessage.getID());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mMessage.getID());
+			});
 		}
 	}
 	
@@ -208,22 +183,15 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IUser> users = mMessage.getMentions();
 				LuaValue luaUsers = LuaValue.tableOf();
-				for(IUser user : users)
+				for (IUser user : users)
 				{
-					luaUsers.set(luaUsers.length()+1, (new LuaUser(user)).getTable());
+					luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
 				}
-			}
-			catch(LuaError e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				return luaUsers;
+			});
 		}
 	}	
 	
@@ -232,7 +200,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mMessage.getTimestamp().toString());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mMessage.getTimestamp().toString());
+			});
 		}
 	}
 	
@@ -241,7 +211,9 @@ public class LuaMessage
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mMessage.mentionsEveryone());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mMessage.mentionsEveryone());
+			});
 		}
 	}
 	
@@ -250,19 +222,10 @@ public class LuaMessage
 		@Override
 		public LuaValue call(LuaValue content) 
 		{
-			return RequestBuffer.request(() -> {
-				try
-				{
-					mMessage.reply(content.tojstring());
-				}
-				catch (MissingPermissionsException | DiscordException e)
-				{
-					mLogger.error(e.getMessage());
-					Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				}
-				
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mMessage.reply(content.tojstring());
 				return LuaValue.NIL;
-			}).get();
+			});
 		}
 	}
 	
@@ -288,7 +251,9 @@ public class LuaMessage
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mMessageAttachment.getFilename());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mMessageAttachment.getFilename());
+				});
 			}
 		}
 		
@@ -297,7 +262,9 @@ public class LuaMessage
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mMessageAttachment.getFilesize());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mMessageAttachment.getFilesize());
+				});
 			}
 		}
 		
@@ -306,7 +273,9 @@ public class LuaMessage
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mMessageAttachment.getId());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mMessageAttachment.getId());
+				});
 			}
 		}
 		
@@ -315,7 +284,9 @@ public class LuaMessage
 			@Override
 			public LuaValue call()
 			{
-				return LuaValue.valueOf(mMessageAttachment.getUrl());
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return LuaValue.valueOf(mMessageAttachment.getUrl());
+				});
 			}
 		}
 		
