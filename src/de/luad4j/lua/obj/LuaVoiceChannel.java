@@ -21,8 +21,7 @@ package de.luad4j.lua.obj;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-import de.luad4j.Main;
-import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class LuaVoiceChannel extends LuaChannel
@@ -47,17 +46,9 @@ public class LuaVoiceChannel extends LuaChannel
 		@Override
 		public LuaValue call()
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				return (new LuaAudioChannel(mVoiceChannel.getAudioChannel())).getTable();
-			}
-			catch (Exception e)
-			{
-				mLogger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -66,7 +57,9 @@ public class LuaVoiceChannel extends LuaChannel
 		@Override
 		public LuaValue call()
 		{
-			return LuaValue.valueOf(mVoiceChannel.isConnected());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mVoiceChannel.isConnected());
+			});
 		}
 	}
 	
@@ -75,8 +68,10 @@ public class LuaVoiceChannel extends LuaChannel
 		@Override
 		public LuaValue call()
 		{
-			mVoiceChannel.join();
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mVoiceChannel.join();
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -85,8 +80,10 @@ public class LuaVoiceChannel extends LuaChannel
 		@Override
 		public LuaValue call()
 		{
-			mVoiceChannel.leave();
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				mVoiceChannel.leave();
+				return LuaValue.NIL;
+			});
 		}
 	}
 }

@@ -36,34 +36,22 @@ import org.luaj.vm2.LuaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: implement wrapper for every event
+
 public class EventHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
 
-	// Custom Events
 	@EventSubscriber
-	public void onLuaError(LuaErrorEvent event)
+	public void onJavaError(JavaErrorEvent event)
 	{
-		if (Main.mLuaEnv.get("onLuaError").isfunction())
+		if (Main.mLuaEnv.get("onJavaErrorEvent").isfunction())
 		{
-			Main.mLuaEnv.get("onLuaError").call(event.getMessage());
+			Main.mLuaEnv.get("onJavaErrorEvent").call(event.getMessage());
 		}
 		else
 		{
-			logger.warn("[JAVA] onLuaError(string: reason) undefined. It is recommended to define a LuaError event handler.");
-		}
-	}
-
-	@EventSubscriber
-	public void onJavaError(LuaErrorEvent event)
-	{
-		if (Main.mLuaEnv.get("onLuaError").isfunction())
-		{
-			Main.mLuaEnv.get("onLuaError").call(event.getMessage());
-		}
-		else
-		{
-			logger.warn("[JAVA] onJavaError(string: reason) undefined. It is recommended to define a JavaError event handler.");
+			logger.warn("[JAVA] onJavaErrorEvent(string: reason) undefined. It is recommended to define a JavaError event handler.");
 		}
 	}
 
@@ -393,6 +381,8 @@ public class EventHandler
 			} 
 		}
 	}
+	
+	@SuppressWarnings("deprecation")
 	@EventSubscriber
 	public void onInviteReceivedEvent(InviteReceivedEvent event)
 	{

@@ -21,6 +21,7 @@ package de.luad4j.lua.obj;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.util.MessageList;
 
 public class LuaMessageList
@@ -42,7 +43,9 @@ public class LuaMessageList
 		@Override
 		public LuaValue call(LuaValue messageID)
 		{
-			return (new LuaMessage(mMessageList.get(messageID.tojstring()))).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaMessage(mMessageList.get(messageID.tojstring()))).getTable();
+			});
 		}
 	}
 	

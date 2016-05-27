@@ -21,6 +21,7 @@ package de.luad4j.lua.obj;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 
 public class LuaPrivateChannel extends LuaChannel
@@ -42,7 +43,9 @@ public class LuaPrivateChannel extends LuaChannel
 		@Override
 		public LuaValue call()
 		{
-			return (new LuaUser(mPrivateChannel.getRecipient())).getTable();
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return (new LuaUser(mPrivateChannel.getRecipient())).getTable();
+			});
 		}
 	}
 }

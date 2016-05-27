@@ -20,27 +20,18 @@ package de.luad4j.lua.obj;
 
 import java.util.List;
 
-import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.luad4j.Main;
-import de.luad4j.events.JavaErrorEvent;
+import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
-import sx.blah.discord.util.MissingPermissionsException;
 
 public class LuaUser
 {
 	private final IUser		mUser;			// User object inside Java
 	private final LuaValue	mLuaUser;		// Lua implementation of User
-	
-	private static final Logger logger = LoggerFactory.getLogger(LuaUser.class);	// Logger of this class
 	
 	// Constructor
 	public LuaUser(IUser user)
@@ -69,7 +60,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getAvatar());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getAvatar());
+			});
 		}
 	}
 	
@@ -78,7 +71,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getAvatarURL());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getAvatarURL());
+			});
 		}
 	}
 	
@@ -87,7 +82,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getCreationDate().toString());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getCreationDate().toString());
+			});
 		}
 	}
 	
@@ -96,7 +93,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getDiscriminator());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getDiscriminator());
+			});
 		}
 	}
 	
@@ -105,11 +104,13 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			if(mUser.getGame().isPresent())
-			{
-				return LuaValue.valueOf(mUser.getGame().get());
-			}
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				if (mUser.getGame().isPresent())
+				{
+					return LuaValue.valueOf(mUser.getGame().get());
+				}
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -118,7 +119,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getID());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getID());
+			});
 		}
 	}
 	
@@ -127,7 +130,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getName());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getName());
+			});
 		}
 	}
 	
@@ -136,7 +141,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.getPresence().name());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.getPresence().name());
+			});
 		}
 	}
 	
@@ -145,24 +152,15 @@ public class LuaUser
 		@Override
 		public LuaValue call(LuaValue guildID) 
 		{
-			try
-			{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IRole> roles = mUser.getRolesForGuild(Main.mDiscordClient.getGuildByID(guildID.tojstring()));
 				LuaValue luaRoles = LuaValue.tableOf();
-				for(IRole role : roles)
+				for (IRole role : roles)
 				{
-					luaRoles.set(luaRoles.length()+1, (new LuaRole(role)).getTable());
+					luaRoles.set(luaRoles.length() + 1, (new LuaRole(role)).getTable());
 				}
-				
 				return luaRoles;
-			}
-			catch(LuaError e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -171,12 +169,13 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			if(mUser.getVoiceChannel().isPresent())
-			{
-				return (new LuaVoiceChannel(mUser.getVoiceChannel().get())).getTable();
-			}
-			
-			return LuaValue.NIL;
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				if (mUser.getVoiceChannel().isPresent())
+				{
+					return (new LuaVoiceChannel(mUser.getVoiceChannel().get())).getTable();
+				}
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
@@ -185,7 +184,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.isBot());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.isBot());
+			});
 		}
 	}
 	
@@ -194,7 +195,9 @@ public class LuaUser
 		@Override
 		public LuaValue call() 
 		{
-			return LuaValue.valueOf(mUser.mention());
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.mention());
+			});
 		}
 	}
 	
@@ -203,17 +206,10 @@ public class LuaUser
 		@Override
 		public LuaValue call(LuaValue channelid) 
 		{
-			try
-			{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
 				mUser.moveToVoiceChannel(Main.mDiscordClient.getVoiceChannelByID(channelid.tojstring()));
-			}
-			catch (DiscordException | HTTP429Exception | MissingPermissionsException e)
-			{
-				logger.error(e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-			
-			return LuaValue.NIL;
+				return LuaValue.NIL;
+			});
 		}
 	}
 	
