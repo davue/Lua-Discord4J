@@ -84,7 +84,11 @@ public class Main
 				mLogger.info("Usage: java -jar Lua-Discord4J.jar -bot <bottoken> <luamainfile> [port]");
 				System.exit(0);
 			}
-
+			
+			// Init message
+			mLogger.info("Lua-Discord4J v1.0.1");
+			mLogger.info("A Lua wrapper for Discord4J. Copyright (c) 2016, Licensed under GNU GPLv3");
+			
 			// Start port listener if desired
 			if(!args[args.length-1].equals(mLuaPath))
 			{
