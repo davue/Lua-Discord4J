@@ -18,10 +18,13 @@
 
 package de.luad4j.lua.obj;
 
+import java.util.List;
+
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import de.luad4j.lua.LuaHelper;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class LuaVoiceChannel extends LuaChannel
@@ -35,19 +38,25 @@ public class LuaVoiceChannel extends LuaChannel
 		mVoiceChannel = channel;
 		
 		// Init Lua
-		super.mLuaChannel.set("getAudioChannel", new GetAudioChannel());
+		super.mLuaChannel.set("getConnectedUsers", new GetConnectedUsers());
 		super.mLuaChannel.set("isConnected", new IsConnected());
 		super.mLuaChannel.set("join", new Join());
 		super.mLuaChannel.set("leave", new Leave());
 	}
 	
-	private class GetAudioChannel extends ZeroArgFunction
+	private class GetConnectedUsers extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				return (new LuaAudioChannel(mVoiceChannel.getAudioChannel())).getTable();
+				List<IUser> users = mVoiceChannel.getConnectedUsers();
+				LuaValue luaUsers = LuaValue.tableOf();
+				for (IUser user : users)
+				{
+					luaUsers.set(luaUsers.length() + 1, new LuaUser(user).getTable());
+				}
+				return luaUsers;
 			});
 		}
 	}

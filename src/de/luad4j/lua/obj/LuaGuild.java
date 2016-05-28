@@ -20,8 +20,6 @@ package de.luad4j.lua.obj;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
-
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
@@ -113,8 +111,7 @@ public class LuaGuild
 		public LuaValue call(LuaValue channelID)
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
-				mGuild.changeAFKChannel(
-						Optional.ofNullable(Main.mDiscordClient.getVoiceChannelByID(channelID.tojstring())));
+				mGuild.changeAFKChannel(Main.mDiscordClient.getVoiceChannelByID(channelID.tojstring()));
 				return LuaValue.NIL;
 			});
 		}
@@ -139,7 +136,7 @@ public class LuaGuild
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
 				File file = new File(filepath.tojstring(1));
-				mGuild.changeIcon(Optional.ofNullable(Image.forFile(file)));
+				mGuild.changeIcon(Image.forFile(file));
 				return LuaValue.NIL;
 			});
 		}

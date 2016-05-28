@@ -27,6 +27,7 @@ import de.luad4j.Main;
 import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class LuaUser
 {
@@ -42,6 +43,7 @@ public class LuaUser
 		mLuaUser = LuaValue.tableOf();
 		mLuaUser.set("getAvatar", new GetAvatar());
 		mLuaUser.set("getAvatarURL", new GetAvatarURL());
+		mLuaUser.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
 		mLuaUser.set("getCreationDate", new GetCreationDate());
 		mLuaUser.set("getDiscriminator", new GetDiscriminator());
 		mLuaUser.set("getGame", new GetGame());
@@ -49,7 +51,6 @@ public class LuaUser
 		mLuaUser.set("getName", new GetName());
 		mLuaUser.set("getPresence", new GetPresence());
 		mLuaUser.set("getRolesForGuildID", new GetRolesForGuildID());
-		mLuaUser.set("getVoiceChannel", new GetVoiceChannel());
 		mLuaUser.set("isBot", new IsBot());
 		mLuaUser.set("mention", new Mention());
 		mLuaUser.set("moveToVoiceChannel", new MoveToVoiceChannel());
@@ -73,6 +74,23 @@ public class LuaUser
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				return LuaValue.valueOf(mUser.getAvatarURL());
+			});
+		}
+	}
+
+	private class GetConnectedVoiceChannels extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call() 
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IVoiceChannel> voiceChannels = mUser.getConnectedVoiceChannels();
+				LuaValue luaVoiceChannel = LuaValue.tableOf();
+				for (IVoiceChannel voiceChannel : voiceChannels)
+				{
+					luaVoiceChannel.set(luaVoiceChannel.length() + 1, (new LuaVoiceChannel(voiceChannel)).getTable());
+				}
+				return luaVoiceChannel;
 			});
 		}
 	}
@@ -160,21 +178,6 @@ public class LuaUser
 					luaRoles.set(luaRoles.length() + 1, (new LuaRole(role)).getTable());
 				}
 				return luaRoles;
-			});
-		}
-	}
-	
-	private class GetVoiceChannel extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call() 
-		{
-			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				if (mUser.getVoiceChannel().isPresent())
-				{
-					return (new LuaVoiceChannel(mUser.getVoiceChannel().get())).getTable();
-				}
-				return LuaValue.NIL;
 			});
 		}
 	}

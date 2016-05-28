@@ -139,10 +139,21 @@ public class LuaClient
 		public LuaValue invoke(Varargs args)
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
-				File file = new File(args.tojstring(1));
-				IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)),
-						Optional.ofNullable(Image.forFile(file)));
-				return (new LuaGuild(guild)).getTable();
+				if(args.narg() == 2)
+				{
+					IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)));
+					return (new LuaGuild(guild)).getTable();
+				}
+				else if(args.narg() == 3)
+				{
+					File file = new File(args.tojstring(1));
+					IGuild guild = mClient.createGuild(args.tojstring(1), mClient.getRegionByID(args.tojstring(2)), Image.forFile(file));
+					return (new LuaGuild(guild)).getTable();
+				}
+				else
+				{
+					return LuaValue.NIL;
+				}
 			});
 		}
 	}
