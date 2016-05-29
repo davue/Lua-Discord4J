@@ -86,7 +86,7 @@ public class Main
 			}
 			
 			// Init message
-			mLogger.info("Lua-Discord4J v1.0.1");
+			mLogger.info("Lua-Discord4J v1.1.0");
 			mLogger.info("A Lua wrapper for Discord4J. Copyright (c) 2016, Licensed under GNU GPLv3");
 			
 			// Start port listener if desired

@@ -36,6 +36,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRegion;
 import sx.blah.discord.util.Image;
+import sx.blah.discord.util.audio.AudioPlayer;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.Status;
 
@@ -77,9 +78,12 @@ public class LuaClient
 		mLuaClient.set("logout", new Logout());
 		
 		// Implement status builders
-		mLuaClient.set("setEmptyStatus", new SetEmptyStatus());
+		mLuaClient.set("clearStatus", new ClearStatus());
 		mLuaClient.set("setGame", new SetGame());
 		mLuaClient.set("setStream", new SetStream());
+		
+		// Implement audio player builder
+		mLuaClient.set("getAudioPlayerForGuild", new GetAudioPlayerForGuild());
 	}
 
 	private static class ChangeAvatar extends OneArgFunction
@@ -431,7 +435,7 @@ public class LuaClient
 	}
 	
 	// Status changer methods
-	private static class SetEmptyStatus extends ZeroArgFunction
+	private static class ClearStatus extends ZeroArgFunction
 	{
 		@Override
 		public LuaValue call()
@@ -462,6 +466,18 @@ public class LuaClient
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
 				mClient.changeStatus(Status.stream(message.tojstring(), url.tojstring()));
+				return LuaValue.NIL;
+			});
+		}
+	}
+	
+	private static class GetAudioPlayerForGuild extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue guildID)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				AudioPlayer.getAudioPlayerForGuild(mClient.getGuildByID(guildID.tojstring()));
 				return LuaValue.NIL;
 			});
 		}
