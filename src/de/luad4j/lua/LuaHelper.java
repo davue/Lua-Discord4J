@@ -26,9 +26,9 @@ public class LuaHelper
 			{
 				logger.error(e.getMessage());
 				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-				if(e.getClass() == HTTP429Exception.class)
+				if(e instanceof HTTP429Exception)
 				{
-					throw new HTTP429Exception(e.getMessage(), 0);
+					throw (HTTP429Exception) e;
 				}
 			}
 			

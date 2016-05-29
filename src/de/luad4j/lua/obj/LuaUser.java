@@ -21,7 +21,9 @@ package de.luad4j.lua.obj;
 import java.util.List;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import de.luad4j.Main;
 import de.luad4j.lua.LuaHelper;
@@ -46,12 +48,15 @@ public class LuaUser
 		mLuaUser.set("getConnectedVoiceChannels", new GetConnectedVoiceChannels());
 		mLuaUser.set("getCreationDate", new GetCreationDate());
 		mLuaUser.set("getDiscriminator", new GetDiscriminator());
-		mLuaUser.set("getGame", new GetGame());
+		mLuaUser.set("getDisplayName", new GetDisplayName());
 		mLuaUser.set("getID", new GetID());
 		mLuaUser.set("getName", new GetName());
 		mLuaUser.set("getPresence", new GetPresence());
 		mLuaUser.set("getRolesForGuildID", new GetRolesForGuildID());
+		mLuaUser.set("getStatus", new GetStatus());
 		mLuaUser.set("isBot", new IsBot());
+		mLuaUser.set("isDeaf", new IsDeaf());
+		mLuaUser.set("isMuted", new IsMuted());
 		mLuaUser.set("mention", new Mention());
 		mLuaUser.set("moveToVoiceChannel", new MoveToVoiceChannel());
 	}
@@ -117,17 +122,13 @@ public class LuaUser
 		}
 	}
 	
-	private class GetGame extends ZeroArgFunction
+	private class GetDisplayName extends OneArgFunction
 	{
 		@Override
-		public LuaValue call() 
+		public LuaValue call(LuaValue guildID) 
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				if (mUser.getGame().isPresent())
-				{
-					return LuaValue.valueOf(mUser.getGame().get());
-				}
-				return LuaValue.NIL;
+				return LuaValue.valueOf(mUser.getDisplayName(Main.mDiscordClient.getGuildByID(guildID.tojstring())));
 			});
 		}
 	}
@@ -182,6 +183,17 @@ public class LuaUser
 		}
 	}
 	
+	private class GetStatus extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call() 
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return new LuaStatus(mUser.getStatus()).getTable();
+			});
+		}
+	}
+	
 	private class IsBot extends ZeroArgFunction
 	{
 		@Override
@@ -193,13 +205,46 @@ public class LuaUser
 		}
 	}
 	
-	private class Mention extends ZeroArgFunction
+	private class IsDeaf extends OneArgFunction
 	{
 		@Override
-		public LuaValue call() 
+		public LuaValue call(LuaValue guildID) 
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				return LuaValue.valueOf(mUser.mention());
+				return LuaValue.valueOf(mUser.isDeaf(Main.mDiscordClient.getGuildByID(guildID.tojstring())));
+			});
+		}
+	}
+	
+	private class IsMuted extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue guildID) 
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mUser.isMuted(Main.mDiscordClient.getGuildByID(guildID.tojstring())));
+			});
+		}
+	}
+	
+	private class Mention extends VarArgFunction
+	{
+		@Override
+		public LuaValue invoke(Varargs args) 
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				if(args.narg() == 0)
+				{
+					return LuaValue.valueOf(mUser.mention());
+				}
+				else if(args.narg() == 1)
+				{
+					return LuaValue.valueOf(mUser.mention(args.toboolean(1)));
+				}
+				else
+				{
+					return LuaValue.NIL;
+				}
 			});
 		}
 	}

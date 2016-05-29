@@ -36,6 +36,7 @@ import de.luad4j.Main;
 import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IInvite;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 
 public class LuaChannel
@@ -70,6 +71,7 @@ public class LuaChannel
 		mLuaChannel.set("getTopic", new GetTopic());
 		mLuaChannel.set("getTypingStatus", new GetTypingStatus());
 		mLuaChannel.set("getUserOverrides", new GetUserOverrides());
+		mLuaChannel.set("getUsersHere", new GetUsersHere());
 		mLuaChannel.set("isPrivate", new IsPrivate());
 		mLuaChannel.set("mention", new Mention());
 		mLuaChannel.set("overrideRolePermissions", new OverrideRolePermissions());
@@ -187,7 +189,7 @@ public class LuaChannel
 				{
 					luaInvite.set(luaInvite.length() + 1, (new LuaInvite(invite)).getTable());
 				} 
-				return LuaValue.NIL;
+				return luaInvite;
 			});
 		}
 	}
@@ -286,6 +288,23 @@ public class LuaChannel
 							(new LuaPermissionOverride(permissionOverride.getValue())).getTable());
 				}
 				return luaPermissionOverrides;
+			});
+		}
+	}
+	
+	private class GetUsersHere extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IUser> users = mChannel.getUsersHere();
+				LuaValue luaUsers = LuaValue.tableOf();
+				for (IUser user : users)
+				{
+					luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
+				} 
+				return luaUsers;
 			});
 		}
 	}

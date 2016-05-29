@@ -21,7 +21,6 @@ package de.luad4j.lua.obj;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -38,6 +37,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRegion;
 import sx.blah.discord.util.Image;
 import sx.blah.discord.handle.obj.IVoiceChannel;
+import sx.blah.discord.handle.obj.Status;
 
 // Client is a global lua table -> no getClient() lua implementation needed for other objects
 
@@ -52,6 +52,7 @@ public class LuaClient
 		mLuaClient.set("changeAvatar", new ChangeAvatar());
 		mLuaClient.set("changeEmail", new ChangeEmail());
 		mLuaClient.set("changePassword", new ChangePassword());
+		mLuaClient.set("changePresence", new ChangePresence());
 		mLuaClient.set("changeUsername", new ChangeUsername());
 		mLuaClient.set("createGuild", new CreateGuild());
 		mLuaClient.set("getChannelByID", new GetChannelByID());
@@ -74,7 +75,11 @@ public class LuaClient
 		mLuaClient.set("isReady", new IsReady());
 		mLuaClient.set("login", new Login());
 		mLuaClient.set("logout", new Logout());
-		mLuaClient.set("updatePresence", new UpdatePresence());
+		
+		// Implement status builders
+		mLuaClient.set("setEmptyStatus", new SetEmptyStatus());
+		mLuaClient.set("setGame", new SetGame());
+		mLuaClient.set("setStream", new SetStream());
 	}
 
 	private static class ChangeAvatar extends OneArgFunction
@@ -120,7 +125,21 @@ public class LuaClient
 			});
 		}
 	}
+	
+	private static class ChangePresence extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue isIdle)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changePresence(isIdle.toboolean());
+				return LuaValue.NIL;
+			});
+		}
+	}
 
+	// changeStatus not implemented, see status changer methods below
+	
 	private static class ChangeUsername extends OneArgFunction
 	{
 		@Override
@@ -411,20 +430,38 @@ public class LuaClient
 		}
 	}
 	
-	private static class UpdatePresence extends TwoArgFunction
+	// Status changer methods
+	private static class SetEmptyStatus extends ZeroArgFunction
 	{
 		@Override
-		public LuaValue call(LuaValue isIdle, LuaValue game)
+		public LuaValue call()
 		{
-			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				if (game == LuaValue.NIL)
-				{
-					mClient.updatePresence(isIdle.toboolean(), Optional.empty());
-				}
-				else
-				{
-					mClient.updatePresence(isIdle.toboolean(), Optional.ofNullable(game.tojstring()));
-				}
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changeStatus(Status.empty());
+				return LuaValue.NIL;
+			});
+		}
+	}
+	
+	private static class SetGame extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue game)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changeStatus(Status.game(game.tojstring()));
+				return LuaValue.NIL;
+			});
+		}
+	}
+	
+	private static class SetStream extends TwoArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue message, LuaValue url)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mClient.changeStatus(Status.stream(message.tojstring(), url.tojstring()));
 				return LuaValue.NIL;
 			});
 		}

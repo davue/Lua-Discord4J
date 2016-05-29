@@ -38,6 +38,8 @@ public class LuaMessageList
 		mLuaMessageList.set("get", new Get());
 	}
 	
+	// TODO: implement more functionality
+	
 	private class Get extends OneArgFunction
 	{
 		@Override

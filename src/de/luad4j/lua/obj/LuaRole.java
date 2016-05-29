@@ -43,6 +43,7 @@ public class LuaRole
 		mLuaRole = LuaValue.tableOf();
 		mLuaRole.set("changeColor", new ChangeColor());
 		mLuaRole.set("changeHoist", new ChangeHoist());
+		mLuaRole.set("changeMentionable", new ChangeMentionable());
 		mLuaRole.set("changeName", new ChangeName());
 		mLuaRole.set("changePermissions", new ChangePermissions());
 		mLuaRole.set("delete", new Delete());
@@ -55,6 +56,7 @@ public class LuaRole
 		mLuaRole.set("getPosition", new GetPosition());
 		mLuaRole.set("isHoisted", new IsHoisted());
 		mLuaRole.set("isManaged", new IsManaged());
+		mLuaRole.set("isMentionable", new IsMentionable());
 	}
 	
 	private class ChangeColor extends OneArgFunction
@@ -76,6 +78,18 @@ public class LuaRole
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
 				mRole.changeHoist(hoist.toboolean());
+				return LuaValue.NIL;
+			});
+		}
+	}
+	
+	private class ChangeMentionable extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue mentionable)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mRole.changeMentionable(mentionable.toboolean());
 				return LuaValue.NIL;
 			});
 		}
@@ -229,6 +243,17 @@ public class LuaRole
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				return LuaValue.valueOf(mRole.isManaged());
+			});
+		}
+	}
+	
+	private class IsMentionable extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call()
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				return LuaValue.valueOf(mRole.isMentionable());
 			});
 		}
 	}

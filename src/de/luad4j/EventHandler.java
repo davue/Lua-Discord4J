@@ -29,6 +29,7 @@ import de.luad4j.lua.obj.LuaGuild;
 import de.luad4j.lua.obj.LuaInvite;
 import de.luad4j.lua.obj.LuaMessage;
 import de.luad4j.lua.obj.LuaRole;
+import de.luad4j.lua.obj.LuaStatus;
 import de.luad4j.lua.obj.LuaUser;
 import de.luad4j.lua.obj.LuaVoiceChannel;
 
@@ -64,126 +65,6 @@ public class EventHandler
 		}
 	}
 
-	@EventSubscriber
-	public void onAudioPlayEvent(AudioPlayEvent event)
-	{
-		if(Main.mLuaEnv.get("on"+event.getClass().getSimpleName()).isfunction())
-		{
-			try
-			{
-				LuaValue audio = LuaValue.tableOf();
-				if(event.getFileSource().isPresent())
-				{
-					audio.set("file", event.getFileSource().get().getAbsolutePath());
-				}
-				
-				if(event.getUrlSource().isPresent())
-				{
-					audio.set("url", event.getUrlSource().get().toExternalForm());
-				}
-				
-				audio.set("format", event.getFormat().toString());
-				
-				Main.mLuaEnv.get("on"+event.getClass().getSimpleName()).call(audio);
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
-				Main.mDiscordClient.getDispatcher().dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			}
-		}
-	}
-	@EventSubscriber
-	public void onAudioQueuedEvent(AudioQueuedEvent event)
-	{
-		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
-		{
-			try
-			{
-				LuaValue audio = LuaValue.tableOf();
-				if (event.getFileSource().isPresent())
-				{
-					audio.set("file", event.getFileSource().get().getAbsolutePath());
-				}
-
-				if (event.getUrlSource().isPresent())
-				{
-					audio.set("url", event.getUrlSource().get().toExternalForm());
-				}
-
-				audio.set("format", event.getFormat().toString());
-
-				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(audio);
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
-				Main.mDiscordClient.getDispatcher()
-						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			} 
-		}
-	}
-	// AudioReceiveEvent not needed
-	@EventSubscriber
-	public void onAudioStopEvent(AudioStopEvent event)
-	{
-		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
-		{
-			try
-			{
-				LuaValue audio = LuaValue.tableOf();
-				if (event.getFileSource().isPresent())
-				{
-					audio.set("file", event.getFileSource().get().getAbsolutePath());
-				}
-
-				if (event.getUrlSource().isPresent())
-				{
-					audio.set("url", event.getUrlSource().get().toExternalForm());
-				}
-
-				audio.set("format", event.getFormat().toString());
-
-				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(audio);
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
-				Main.mDiscordClient.getDispatcher()
-						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			} 
-		}
-	}
-	@EventSubscriber
-	public void onAudioUnqueuedEvent(AudioUnqueuedEvent event)
-	{
-		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
-		{
-			try
-			{
-				LuaValue audio = LuaValue.tableOf();
-				if (event.getFileSource().isPresent())
-				{
-					audio.set("file", event.getFileSource().get().getAbsolutePath());
-				}
-
-				if (event.getUrlSource().isPresent())
-				{
-					audio.set("url", event.getUrlSource().get().toExternalForm());
-				}
-
-				audio.set("format", event.getFormat().toString());
-
-				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(audio);
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
-				Main.mDiscordClient.getDispatcher()
-						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			} 
-		}
-	}
 	@EventSubscriber
 	public void onChannelCreateEvent(ChannelCreateEvent event)
 	{
@@ -250,27 +131,6 @@ public class EventHandler
 			try
 			{
 				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(event.getReason().name());
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
-				Main.mDiscordClient.getDispatcher()
-						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			} 
-		}
-	}
-	@EventSubscriber
-	public void onGameChangeEvent(GameChangeEvent event)
-	{
-		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
-		{
-			try
-			{
-				LuaValue games = LuaValue.tableOf();
-				games.set("old", event.getOldGame().orElse("nil"));
-				games.set("new", event.getNewGame().orElse("nil"));
-
-				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(games);
 			}
 			catch (Exception e)
 			{
@@ -602,6 +462,29 @@ public class EventHandler
 		}
 	}
 	@EventSubscriber
+	public void onStausChangeEvent(StatusChangeEvent event)
+	{
+		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
+		{
+			try
+			{
+				LuaValue statusEvent = LuaValue.tableOf();
+				statusEvent.set("guild", (new LuaGuild(event.getGuild())).getTable());
+				statusEvent.set("user", (new LuaUser(event.getUser())).getTable());
+				statusEvent.set("oldstatus", (new LuaStatus(event.getOldStatus())).getTable());
+				statusEvent.set("oldstatus", (new LuaStatus(event.getNewStatus())).getTable());
+
+				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(statusEvent);
+			}
+			catch (Exception e)
+			{
+				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
+				Main.mDiscordClient.getDispatcher()
+						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
+			} 
+		}
+	}
+	@EventSubscriber
 	public void onTypingEvent(TypingEvent event)
 	{
 		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
@@ -819,23 +702,6 @@ public class EventHandler
 				userVoiceChannelEvent.set("newchannel", new LuaVoiceChannel(event.getNewChannel()).getTable());
 
 				Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).checkfunction().call(userVoiceChannelEvent);
-			}
-			catch (Exception e)
-			{
-				logger.error(e.getClass().getSimpleName() + ":" + e.getMessage());
-				Main.mDiscordClient.getDispatcher()
-						.dispatch(new JavaErrorEvent(e.getClass().getSimpleName() + ":" + e.getMessage()));
-			} 
-		}
-	}
-	@EventSubscriber
-	public void onUserVoiceStateUpdateEvent(UserVoiceStateUpdateEvent event)
-	{
-		if (Main.mLuaEnv.get("on" + event.getClass().getSimpleName()).isfunction())
-		{
-			try
-			{
-				// TODO: implement this
 			}
 			catch (Exception e)
 			{

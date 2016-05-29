@@ -25,6 +25,7 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 
 public class LuaMessage 
@@ -49,6 +50,7 @@ public class LuaMessage
 		mLuaMessage.set("getGuild", new GetGuild());
 		mLuaMessage.set("getID", new GetID());
 		mLuaMessage.set("getMentions", new GetMentions());
+		mLuaMessage.set("getRoleMentions", new GetRoleMentions());
 		mLuaMessage.set("getTimestamp", new GetTimestamp());
 		mLuaMessage.set("mentionsEveryone", new MentionsEveryone());
 		mLuaMessage.set("reply", new Reply());
@@ -191,6 +193,23 @@ public class LuaMessage
 					luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
 				}
 				return luaUsers;
+			});
+		}
+	}	
+	
+	private class GetRoleMentions extends ZeroArgFunction
+	{
+		@Override
+		public LuaValue call() 
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IRole> roles = mMessage.getRoleMentions();
+				LuaValue luaRoles = LuaValue.tableOf();
+				for (IRole role : roles)
+				{
+					luaRoles.set(luaRoles.length() + 1, (new LuaRole(role)).getTable());
+				}
+				return luaRoles;
 			});
 		}
 	}	

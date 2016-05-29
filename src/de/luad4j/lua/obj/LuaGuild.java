@@ -52,17 +52,17 @@ public class LuaGuild
 		mLuaGuild.set("changeIcon", new ChangeIcon());
 		mLuaGuild.set("changeName", new ChangeName());
 		mLuaGuild.set("changeRegion", new ChangeRegion());
-		mLuaGuild.set("changeChannel", new CreateChannel());
+		mLuaGuild.set("createChannel", new CreateChannel());
 		mLuaGuild.set("createRole", new CreateRole());
 		mLuaGuild.set("createVoiceChannel", new CreateVoiceChannel());
 		mLuaGuild.set("deleteGuild", new DeleteGuild());
 		mLuaGuild.set("editUserRoles", new EditUserRoles());
 		mLuaGuild.set("getAFKChannel", new GetAFKChannel());
 		mLuaGuild.set("getAFKTimeout", new GetAFKTimeout());
-		mLuaGuild.set("getAudioChannel", new GetAudioChannel());
 		mLuaGuild.set("getBannedUsers", new GetBannedUsers());
 		mLuaGuild.set("getChannelByID", new GetChannelByID());
 		mLuaGuild.set("getChannels", new GetChannels());
+		mLuaGuild.set("getChannelsByName", new GetChannelsByName());
 		mLuaGuild.set("getCreationDate", new GetCreationDate());
 		mLuaGuild.set("getEveryoneRole", new GetEveryoneRole());
 		mLuaGuild.set("getIcon", new GetIcon());
@@ -75,15 +75,22 @@ public class LuaGuild
 		mLuaGuild.set("getRegion", new GetRegion());
 		mLuaGuild.set("getRoleByID", new GetRoleByID());
 		mLuaGuild.set("getRoles", new GetRoles());
+		mLuaGuild.set("getRolesByName", new GetRolesByName());
+		mLuaGuild.set("getRolesForUser", new GetRolesForUser());
 		mLuaGuild.set("getUserByID", new GetUserByID());
 		mLuaGuild.set("getUsers", new GetUsers());
+		mLuaGuild.set("getUsersByName", new GetUsersByName());
 		mLuaGuild.set("getUsersToBePruned", new GetUsersToBePruned());
 		mLuaGuild.set("getVoiceChannelByID", new GetVoiceChannelByID());
 		mLuaGuild.set("getVoiceChannels", new GetVoiceChannels());
+		mLuaGuild.set("getVoiceChannelsByName", new GetVoiceChannelsByName());
 		mLuaGuild.set("kickUser", new KickUser());
 		mLuaGuild.set("leaveGuild", new LeaveGuild());
 		mLuaGuild.set("pardonUser", new PardonUser());
 		mLuaGuild.set("pruneUsers", new PruneUsers());
+		mLuaGuild.set("setDeafenUser", new SetDeafenUser());
+		mLuaGuild.set("setMuteUser", new SetMuteUser());
+		mLuaGuild.set("setUserNickname", new SetUserNickname());
 		mLuaGuild.set("transferOwnership", new TransferOwnership());
 	}
 	
@@ -250,16 +257,7 @@ public class LuaGuild
 		}
 	}
 	
-	private class GetAudioChannel extends ZeroArgFunction
-	{
-		@Override
-		public LuaValue call()
-		{
-			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				return (new LuaAudioChannel(mGuild.getAudioChannel())).getTable();
-			});
-		}
-	}
+	// TODO: implement getAudioManager or something like getAudioPlayer
 	
 	private class GetBannedUsers extends ZeroArgFunction
 	{
@@ -297,6 +295,23 @@ public class LuaGuild
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IChannel> channels = mGuild.getChannels();
+				LuaValue luaChannels = LuaValue.tableOf();
+				for (IChannel channel : channels)
+				{
+					luaChannels.set(luaChannels.length() + 1, (new LuaChannel(channel)).getTable());
+				}
+				return luaChannels;
+			});
+		}
+	}
+	
+	private class GetChannelsByName extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue name)
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IChannel> channels = mGuild.getChannelsByName(name.tojstring());
 				LuaValue luaChannels = LuaValue.tableOf();
 				for (IChannel channel : channels)
 				{
@@ -451,6 +466,40 @@ public class LuaGuild
 		}
 	}
 	
+	private class GetRolesByName extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue name)
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IRole> roles = mGuild.getRolesByName(name.tojstring());
+				LuaValue luaRoles = LuaValue.tableOf();
+				for (IRole role : roles)
+				{
+					luaRoles.set(luaRoles.length() + 1, (new LuaRole(role)).getTable());
+				}
+				return luaRoles;
+			});
+		}
+	}
+	
+	private class GetRolesForUser extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID)
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IRole> roles = mGuild.getRolesForUser(mGuild.getUserByID(userID.tojstring()));
+				LuaValue luaRoles = LuaValue.tableOf();
+				for (IRole role : roles)
+				{
+					luaRoles.set(luaRoles.length() + 1, (new LuaRole(role)).getTable());
+				}
+				return luaRoles;
+			});
+		}
+	}
+	
 	private class GetUserByID extends OneArgFunction
 	{
 		@Override
@@ -475,6 +524,40 @@ public class LuaGuild
 					luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
 				}
 				return luaUsers;
+			});
+		}
+	}
+	
+	private class GetUsersByName extends VarArgFunction
+	{
+		@Override
+		public LuaValue invoke(Varargs args)
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				if(args.narg() == 1)
+				{
+					List<IUser> users = mGuild.getUsersByName(args.tojstring(1));
+					LuaValue luaUsers = LuaValue.tableOf();
+					for (IUser user : users)
+					{
+						luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
+					}
+					return luaUsers;
+				}
+				else if(args.narg() == 2)
+				{
+					List<IUser> users = mGuild.getUsersByName(args.tojstring(1), args.toboolean(2));
+					LuaValue luaUsers = LuaValue.tableOf();
+					for (IUser user : users)
+					{
+						luaUsers.set(luaUsers.length() + 1, (new LuaUser(user)).getTable());
+					}
+					return luaUsers;
+				}
+				else
+				{
+					return LuaValue.NIL;
+				}
 			});
 		}
 	}
@@ -508,6 +591,23 @@ public class LuaGuild
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				List<IVoiceChannel> channels = mGuild.getVoiceChannels();
+				LuaValue luaChannels = LuaValue.tableOf();
+				for (IVoiceChannel channel : channels)
+				{
+					luaChannels.set(luaChannels.length() + 1, (new LuaVoiceChannel(channel)).getTable());
+				}
+				return luaChannels;
+			});
+		}
+	}
+	
+	private class GetVoiceChannelsByName extends OneArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue name)
+		{
+			return LuaHelper.handleExceptions(this.getClass(), () -> {
+				List<IVoiceChannel> channels = mGuild.getVoiceChannelsByName(name.tojstring());
 				LuaValue luaChannels = LuaValue.tableOf();
 				for (IVoiceChannel channel : channels)
 				{
@@ -567,6 +667,42 @@ public class LuaGuild
 	}
 	
 	// TODO: implement reorderRoles()
+	
+	private class SetDeafenUser extends TwoArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID, LuaValue deafen)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.setDeafenUser(mGuild.getUserByID(userID.tojstring()), deafen.toboolean());
+				return LuaValue.NIL;
+			});
+		}
+	}
+	
+	private class SetMuteUser extends TwoArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID, LuaValue mute)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.setMuteUser(mGuild.getUserByID(userID.tojstring()), mute.toboolean());
+				return LuaValue.NIL;
+			});
+		}
+	}
+	
+	private class SetUserNickname extends TwoArgFunction
+	{
+		@Override
+		public LuaValue call(LuaValue userID, LuaValue name)
+		{
+			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
+				mGuild.setUserNickname(mGuild.getUserByID(userID.tojstring()), name.tojstring());
+				return LuaValue.NIL;
+			});
+		}
+	}
 	
 	private class TransferOwnership extends OneArgFunction
 	{
