@@ -145,8 +145,7 @@ public class LuaAudioPlayer
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				File file = new File(filepath.tojstring());
-				mAudioPlayer.queue(file);
-				return LuaValue.NIL;
+				return new LuaTrack(mAudioPlayer.queue(file)).getTable();
 			});
 		}
 	}
@@ -158,8 +157,7 @@ public class LuaAudioPlayer
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
 				URL url = new URL(urlpath.tojstring());
-				mAudioPlayer.queue(url);
-				return LuaValue.NIL;
+				return new LuaTrack(mAudioPlayer.queue(url)).getTable();
 			});
 		}
 	}
