@@ -477,7 +477,7 @@ public class LuaClient
 		public LuaValue call(LuaValue guildID)
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
-				return new LuaAudioPlayer(new TrackedAudioPlayer(mClient.getGuildByID(guildID.tojstring()))).getTable();
+				return new LuaAudioPlayer(TrackedAudioPlayer.getAudioPlayerForGuild(mClient.getGuildByID(guildID.tojstring()))).getTable();
 			});
 		}
 	}

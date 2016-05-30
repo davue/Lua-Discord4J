@@ -13,7 +13,6 @@ import de.luad4j.audio.providers.TrackedFileProvider;
 import de.luad4j.audio.providers.TrackedURLProvider;
 import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.handle.audio.IAudioProvider;
-import sx.blah.discord.util.audio.AudioPlayer;
 
 public class LuaAudioPlayer
 {
@@ -72,9 +71,9 @@ public class LuaAudioPlayer
 		public LuaValue call()
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				List<AudioPlayer.Track> tracks = mAudioPlayer.getPlaylist();
+				List<TrackedAudioPlayer.Track> tracks = mAudioPlayer.getPlaylist();
 				LuaValue luaTracks = LuaValue.tableOf();
-				for(AudioPlayer.Track track : tracks)
+				for(TrackedAudioPlayer.Track track : tracks)
 				{
 					luaTracks.set(luaTracks.length()+1, (new LuaTrack(track)).getTable());
 				}
@@ -236,12 +235,12 @@ public class LuaAudioPlayer
 	
 	private class LuaTrack
 	{
-		private final AudioPlayer.Track mTrack;
+		private final TrackedAudioPlayer.Track mTrack;
 		private final LuaValue mLuaTrack;
 		
 		private LuaValue mTitle = LuaValue.NIL;
 		
-		public LuaTrack(AudioPlayer.Track track)
+		public LuaTrack(TrackedAudioPlayer.Track track)
 		{
 			mTrack = track;
 			
