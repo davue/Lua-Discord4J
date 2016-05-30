@@ -30,13 +30,13 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import de.luad4j.Main;
+import de.luad4j.audio.TrackedAudioPlayer;
 import de.luad4j.lua.LuaHelper;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRegion;
 import sx.blah.discord.util.Image;
-import sx.blah.discord.util.audio.AudioPlayer;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.handle.obj.Status;
 
@@ -477,8 +477,7 @@ public class LuaClient
 		public LuaValue call(LuaValue guildID)
 		{
 			return LuaHelper.handleRequestExceptions(this.getClass(), () -> {
-				AudioPlayer.getAudioPlayerForGuild(mClient.getGuildByID(guildID.tojstring()));
-				return LuaValue.NIL;
+				return new LuaAudioPlayer(new TrackedAudioPlayer(mClient.getGuildByID(guildID.tojstring()))).getTable();
 			});
 		}
 	}

@@ -241,6 +241,8 @@ public class LuaAudioPlayer
 		private final AudioPlayer.Track mTrack;
 		private final LuaValue mLuaTrack;
 		
+		private LuaValue mTitle = LuaValue.NIL;
+		
 		public LuaTrack(AudioPlayer.Track track)
 		{
 			mTrack = track;
@@ -257,6 +259,8 @@ public class LuaAudioPlayer
 			
 			// Custom functions
 			mLuaTrack.set("getSource", new GetSource());
+			mLuaTrack.set("setTitle", new SetTitle());
+			mLuaTrack.set("getTitle", new GetTitle());
 		}
 		
 		private class FastForward extends OneArgFunction
@@ -359,6 +363,29 @@ public class LuaAudioPlayer
 					{
 						return LuaValue.NIL;
 					}
+				});
+			}
+		}
+		
+		private class SetTitle extends OneArgFunction
+		{
+			@Override
+			public LuaValue call(LuaValue title)
+			{
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					mTitle = title;
+					return LuaValue.NIL;
+				});
+			}
+		}
+		
+		private class GetTitle extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					return mTitle;
 				});
 			}
 		}
