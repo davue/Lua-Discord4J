@@ -8,15 +8,19 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import de.luad4j.audio.TrackedAudioPlayer;
+import de.luad4j.audio.providers.TrackedFileProvider;
+import de.luad4j.audio.providers.TrackedURLProvider;
 import de.luad4j.lua.LuaHelper;
+import sx.blah.discord.handle.audio.IAudioProvider;
 import sx.blah.discord.util.audio.AudioPlayer;
 
 public class LuaAudioPlayer
 {
-	private final AudioPlayer mAudioPlayer;
+	private final TrackedAudioPlayer mAudioPlayer;
 	private final LuaValue mLuaAudioPlayer;
 	
-	public LuaAudioPlayer(AudioPlayer audioPlayer)
+	public LuaAudioPlayer(TrackedAudioPlayer audioPlayer)
 	{
 		mAudioPlayer = audioPlayer;
 		
@@ -250,6 +254,9 @@ public class LuaAudioPlayer
 			mLuaTrack.set("getTotalTrackTime", new GetTotalTrackTime());
 			mLuaTrack.set("rewind", new Rewind());
 			mLuaTrack.set("rewindTo", new RewindTo());
+			
+			// Custom functions
+			mLuaTrack.set("getSource", new GetSource());
 		}
 		
 		private class FastForward extends OneArgFunction
@@ -329,6 +336,29 @@ public class LuaAudioPlayer
 				return LuaHelper.handleExceptions(this.getClass(), () -> {
 					mTrack.rewindTo(time.tolong());
 					return LuaValue.NIL;
+				});
+			}
+		}
+		
+		private class GetSource extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					IAudioProvider provider = mTrack.getProvider();
+					if(provider instanceof TrackedFileProvider)
+					{
+						return LuaValue.valueOf(((TrackedFileProvider) provider).getSource());
+					}
+					else if(provider instanceof TrackedURLProvider)
+					{
+						return LuaValue.valueOf(((TrackedURLProvider) provider).getSource());
+					}
+					else
+					{
+						return LuaValue.NIL;
+					}
 				});
 			}
 		}
