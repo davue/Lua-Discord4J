@@ -238,8 +238,6 @@ public class LuaAudioPlayer
 		private final TrackedAudioPlayer.Track mTrack;
 		private final LuaValue mLuaTrack;
 		
-		private LuaValue mTitle = LuaValue.NIL;
-		
 		public LuaTrack(TrackedAudioPlayer.Track track)
 		{
 			mTrack = track;
@@ -370,7 +368,7 @@ public class LuaAudioPlayer
 			public LuaValue call(LuaValue title)
 			{
 				return LuaHelper.handleExceptions(this.getClass(), () -> {
-					mTitle = title;
+					mTrack.setTitle(title.tojstring());
 					return LuaValue.NIL;
 				});
 			}
@@ -382,7 +380,7 @@ public class LuaAudioPlayer
 			public LuaValue call()
 			{
 				return LuaHelper.handleExceptions(this.getClass(), () -> {
-					return mTitle;
+					return LuaValue.valueOf(mTrack.getTitle());
 				});
 			}
 		}
