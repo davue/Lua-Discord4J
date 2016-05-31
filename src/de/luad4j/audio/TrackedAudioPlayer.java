@@ -2,8 +2,10 @@ package de.luad4j.audio;
 
 import org.tritonus.dsp.ais.AmplitudeAudioInputStream;
 
+import de.luad4j.Main;
 import de.luad4j.audio.providers.TrackedFileProvider;
 import de.luad4j.audio.providers.TrackedURLProvider;
+import de.luad4j.events.AudioUpdateEvent;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.handle.audio.IAudioManager;
 import sx.blah.discord.handle.audio.IAudioProcessor;
@@ -269,6 +271,8 @@ public class TrackedAudioPlayer implements IAudioProvider {
 			} else {
 				track.close();
 			}
+			
+			Main.mDiscordClient.getDispatcher().dispatch(new AudioUpdateEvent());
 		}
 	}
 

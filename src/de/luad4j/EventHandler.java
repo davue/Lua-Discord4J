@@ -44,7 +44,7 @@ public class EventHandler
 	private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
 
 	@EventSubscriber
-	public void onJavaError(JavaErrorEvent event)
+	public void onJavaErrorEvent(JavaErrorEvent event)
 	{
 		if (Main.mLuaEnv.get("onJavaErrorEvent").isfunction())
 		{
@@ -55,7 +55,6 @@ public class EventHandler
 			logger.warn("[JAVA] onJavaErrorEvent(string: reason) undefined. It is recommended to define a JavaError event handler.");
 		}
 	}
-
 	@EventSubscriber
 	public void onPortData(PortDataEvent event)
 	{
@@ -64,7 +63,15 @@ public class EventHandler
 			Main.mLuaEnv.get("onPortData").call(event.getData());
 		}
 	}
-
+	@EventSubscriber
+	public void onAudioUpdateEvent(AudioUpdateEvent event)
+	{
+		if (Main.mLuaEnv.get("AudioUpdateEvent").isfunction())
+		{
+			Main.mLuaEnv.get("AudioUpdateEvent").call();
+		}
+	}
+	
 	@EventSubscriber
 	public void onChannelCreateEvent(ChannelCreateEvent event)
 	{
