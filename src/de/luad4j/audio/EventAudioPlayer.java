@@ -3,8 +3,6 @@ package de.luad4j.audio;
 import org.tritonus.dsp.ais.AmplitudeAudioInputStream;
 
 import de.luad4j.Main;
-import de.luad4j.audio.providers.TrackedFileProvider;
-import de.luad4j.audio.providers.TrackedURLProvider;
 import de.luad4j.events.AudioUpdateEvent;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.handle.audio.IAudioManager;
@@ -15,6 +13,9 @@ import sx.blah.discord.util.LogMarkers;
 import sx.blah.discord.util.audio.processors.MultiProcessor;
 import sx.blah.discord.util.audio.processors.PauseableProcessor;
 import sx.blah.discord.util.audio.providers.AudioInputStreamProvider;
+import sx.blah.discord.util.audio.providers.FileProvider;
+import sx.blah.discord.util.audio.providers.URLProvider;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -34,9 +35,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * NOTE: The goal of this class is to provide a wide variety of tools which works on a wide variety of use-cases. As
  * such, the feature set has a wide breadth but not depth.
  */
-public class TrackedAudioPlayer implements IAudioProvider {
+public class EventAudioPlayer implements IAudioProvider {
 
-	private final static Map<IGuild, TrackedAudioPlayer> playerInstances = new ConcurrentHashMap<>();
+	private final static Map<IGuild, EventAudioPlayer> playerInstances = new ConcurrentHashMap<>();
 
 	private final IAudioManager manager;
 
@@ -62,11 +63,11 @@ public class TrackedAudioPlayer implements IAudioProvider {
 	 * @param guild The guild for which the player belongs.
 	 * @return The player.
 	 */
-	public static TrackedAudioPlayer getAudioPlayerForGuild(IGuild guild) {
+	public static EventAudioPlayer getAudioPlayerForGuild(IGuild guild) {
 		if (playerInstances.containsKey(guild)) {
 			return playerInstances.get(guild);
 		} else {
-			return new TrackedAudioPlayer(guild);
+			return new EventAudioPlayer(guild);
 		}
 	}
 
@@ -77,16 +78,16 @@ public class TrackedAudioPlayer implements IAudioProvider {
 	 * @param manager The manager for which the player belongs.
 	 * @return The player.
 	 */
-	public static TrackedAudioPlayer getAudioPlayerForAudioManager(IAudioManager manager) {
+	public static EventAudioPlayer getAudioPlayerForAudioManager(IAudioManager manager) {
 		return getAudioPlayerForGuild(manager.getGuild());
 	}
 
-	public TrackedAudioPlayer(IAudioManager manager) {
+	public EventAudioPlayer(IAudioManager manager) {
 		this.manager = manager;
 		inject();
 	}
 
-	public TrackedAudioPlayer(IGuild guild) {
+	public EventAudioPlayer(IGuild guild) {
 		this(guild.getAudioManager());
 	}
 
@@ -173,7 +174,8 @@ public class TrackedAudioPlayer implements IAudioProvider {
 	 * @throws UnsupportedAudioFileException
 	 */
 	public Track queue(File file) throws IOException, UnsupportedAudioFileException {
-		Track track = new Track(new TrackedFileProvider(file));
+		Track track = new Track(new FileProvider(file));
+		track.getMetadata().put("file", file);
 		queue(track);
 		return track;
 	}
@@ -188,7 +190,8 @@ public class TrackedAudioPlayer implements IAudioProvider {
 	 * @throws UnsupportedAudioFileException
 	 */
 	public Track queue(URL url) throws IOException, UnsupportedAudioFileException {
-		Track track = new Track(new TrackedURLProvider(url));
+		Track track = new Track(new URLProvider(url));
+		track.getMetadata().put("url", url);
 		queue(track);
 		return track;
 	}
@@ -271,9 +274,9 @@ public class TrackedAudioPlayer implements IAudioProvider {
 			} else {
 				track.close();
 			}
-			
-			Main.mDiscordClient.getDispatcher().dispatch(new AudioUpdateEvent());
 		}
+		
+		Main.mDiscordClient.getDispatcher().dispatch(new AudioUpdateEvent(manager.getGuild()));
 	}
 
 	/**
@@ -374,10 +377,10 @@ public class TrackedAudioPlayer implements IAudioProvider {
 
 		private volatile long totalTrackTime = -1;
 		private volatile long currentTrackTime = 0;
-		private volatile String title;
 		private final IAudioProvider provider;
 		private final AmplitudeAudioInputStream stream;
 		private final List<byte[]> audioCache = new CopyOnWriteArrayList<>(); //key = ms timestamp / 20 ms
+		private final Map<String, Object> metadata = new ConcurrentHashMap<>();
 
 		public Track(IAudioProvider provider) {
 			this.provider = provider;
@@ -405,6 +408,19 @@ public class TrackedAudioPlayer implements IAudioProvider {
 				} catch (IOException e) {
 					Discord4J.LOGGER.error(LogMarkers.VOICE, "Discord4J Internal Exception", e);
 				}
+		}
+
+		/**
+		 * This returns a mutable map representing arbitrary metadata attached to this track.
+		 * If the track was created through a File, a key of "file" will have a {@link File} object which represents the
+		 * source of the audio.
+		 * If the track was created through a URL, a key of "url" will have a {@link URL} object which represents the
+		 * source of the audio.
+		 *
+		 * @return The metadata.
+		 */
+		public Map<String, Object> getMetadata() {
+			return metadata;
 		}
 
 		/**
@@ -490,14 +506,6 @@ public class TrackedAudioPlayer implements IAudioProvider {
 			while (isReady() && currentTrackTime != time) {
 				provide();
 			}
-		}
-		
-		public synchronized void setTitle(String title) {
-			this.title = title;
-		}
-		
-		public String getTitle() {
-			return this.title;
 		}
 
 		@Override
