@@ -11,15 +11,15 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import de.luad4j.audio.EventAudioPlayer;
 import de.luad4j.lua.LuaHelper;
-import sx.blah.discord.util.audio.AudioPlayer;
 
 public class LuaAudioPlayer
 {
-	private final AudioPlayer mAudioPlayer;
+	private final EventAudioPlayer mAudioPlayer;
 	private final LuaValue mLuaAudioPlayer;
 	
-	public LuaAudioPlayer(AudioPlayer audioPlayer)
+	public LuaAudioPlayer(EventAudioPlayer audioPlayer)
 	{
 		mAudioPlayer = audioPlayer;
 		
@@ -71,9 +71,9 @@ public class LuaAudioPlayer
 		public LuaValue call()
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				List<AudioPlayer.Track> tracks = mAudioPlayer.getPlaylist();
+				List<EventAudioPlayer.Track> tracks = mAudioPlayer.getPlaylist();
 				LuaValue luaTracks = LuaValue.tableOf();
-				for(AudioPlayer.Track track : tracks)
+				for(EventAudioPlayer.Track track : tracks)
 				{
 					luaTracks.set(luaTracks.length()+1, (new LuaTrack(track)).getTable());
 				}
@@ -235,10 +235,10 @@ public class LuaAudioPlayer
 	
 	private class LuaTrack
 	{
-		private final AudioPlayer.Track mTrack;
+		private final EventAudioPlayer.Track mTrack;
 		private final LuaValue mLuaTrack;
 		
-		public LuaTrack(AudioPlayer.Track track)
+		public LuaTrack(EventAudioPlayer.Track track)
 		{
 			mTrack = track;
 			
