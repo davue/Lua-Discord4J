@@ -287,7 +287,20 @@ public class EventAudioPlayer implements IAudioProvider {
 	public void skipTo(int desiredPosition) {
 		desiredPosition = Math.max(0, desiredPosition);
 		for (int i = 0; i < desiredPosition; i++)
-			skip();
+		{
+			if (trackQueue.size() > 0) {
+				Track track = trackQueue.remove(0);
+
+				if (isLooping()) {
+					track.rewindTo(0); //Have to reset the audio
+					trackQueue.add(track);
+				} else {
+					track.close();
+				}
+			}
+		}
+		
+		Main.mDiscordClient.getDispatcher().dispatch(new AudioUpdateEvent(manager.getGuild()));
 	}
 
 	/**
