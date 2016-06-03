@@ -60,7 +60,15 @@ public class LuaAudioPlayer
 		public LuaValue call()
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				return (new LuaTrack(mAudioPlayer.getCurrentTrack()).getTable());
+				EventAudioPlayer.Track track = mAudioPlayer.getCurrentTrack();
+				if(track != null)
+				{
+					return (new LuaTrack(mAudioPlayer.getCurrentTrack()).getTable());
+				}
+				else
+				{
+					return LuaValue.NIL;
+				}
 			});
 		}
 	}
