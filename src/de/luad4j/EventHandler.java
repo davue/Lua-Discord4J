@@ -66,9 +66,9 @@ public class EventHandler
 	@EventSubscriber
 	public void onAudioUpdateEvent(AudioUpdateEvent event)
 	{
-		if (Main.mLuaEnv.get("AudioUpdateEvent").isfunction())
+		if (Main.mLuaEnv.get("onAudioUpdateEvent").isfunction())
 		{
-			Main.mLuaEnv.get("AudioUpdateEvent").call();
+			Main.mLuaEnv.get("onAudioUpdateEvent").call(event.getGuild().getID());
 		}
 	}
 	

@@ -3,23 +3,23 @@ package de.luad4j.lua.obj;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-import de.luad4j.audio.TrackedAudioPlayer;
-import de.luad4j.audio.providers.TrackedFileProvider;
-import de.luad4j.audio.providers.TrackedURLProvider;
+import de.luad4j.audio.EventAudioPlayer;
 import de.luad4j.lua.LuaHelper;
-import sx.blah.discord.handle.audio.IAudioProvider;
 
 public class LuaAudioPlayer
 {
-	private final TrackedAudioPlayer mAudioPlayer;
+	private final EventAudioPlayer mAudioPlayer;
 	private final LuaValue mLuaAudioPlayer;
 	
-	public LuaAudioPlayer(TrackedAudioPlayer audioPlayer)
+	public LuaAudioPlayer(EventAudioPlayer audioPlayer)
 	{
 		mAudioPlayer = audioPlayer;
 		
@@ -71,9 +71,9 @@ public class LuaAudioPlayer
 		public LuaValue call()
 		{
 			return LuaHelper.handleExceptions(this.getClass(), () -> {
-				List<TrackedAudioPlayer.Track> tracks = mAudioPlayer.getPlaylist();
+				List<EventAudioPlayer.Track> tracks = mAudioPlayer.getPlaylist();
 				LuaValue luaTracks = LuaValue.tableOf();
-				for(TrackedAudioPlayer.Track track : tracks)
+				for(EventAudioPlayer.Track track : tracks)
 				{
 					luaTracks.set(luaTracks.length()+1, (new LuaTrack(track)).getTable());
 				}
@@ -235,10 +235,10 @@ public class LuaAudioPlayer
 	
 	private class LuaTrack
 	{
-		private final TrackedAudioPlayer.Track mTrack;
+		private final EventAudioPlayer.Track mTrack;
 		private final LuaValue mLuaTrack;
 		
-		public LuaTrack(TrackedAudioPlayer.Track track)
+		public LuaTrack(EventAudioPlayer.Track track)
 		{
 			mTrack = track;
 			
@@ -248,14 +248,11 @@ public class LuaAudioPlayer
 			mLuaTrack.set("fastForwardTo", new FastForwardTo());
 			mLuaTrack.set("getChannels", new GetChannels());
 			mLuaTrack.set("getCurrentTrackTime", new GetCurrentTrackTime());
+			mLuaTrack.set("getMetadata", new GetMetadata());
 			mLuaTrack.set("getTotalTrackTime", new GetTotalTrackTime());
 			mLuaTrack.set("rewind", new Rewind());
 			mLuaTrack.set("rewindTo", new RewindTo());
-			
-			// Custom functions
-			mLuaTrack.set("getSource", new GetSource());
-			mLuaTrack.set("setTitle", new SetTitle());
-			mLuaTrack.set("getTitle", new GetTitle());
+			mLuaTrack.set("setMetadata", new SetMetadata());
 		}
 		
 		private class FastForward extends OneArgFunction
@@ -304,6 +301,39 @@ public class LuaAudioPlayer
 			}
 		}
 		
+		private class GetMetadata extends ZeroArgFunction
+		{
+			@Override
+			public LuaValue call()
+			{
+				return LuaHelper.handleExceptions(this.getClass(), () -> {
+					// Parse metadata to lua table
+					Map<String, Object> metadata = mTrack.getMetadata();
+					LuaValue luaMetadata = LuaValue.tableOf();
+					for(Map.Entry<String, Object> data : metadata.entrySet())
+					{
+						if(data.getValue() instanceof URL)
+						{
+							luaMetadata.set(data.getKey(), ((URL) data.getValue()).toString());
+						}
+						else if(data.getValue() instanceof File)
+						{
+							luaMetadata.set(data.getKey(), ((File) data.getValue()).getAbsolutePath());
+						}
+						else if(data.getValue() instanceof String)
+						{
+							luaMetadata.set(data.getKey(), ((String) data.getValue()));
+						}
+						else // No specific object parser
+						{
+							luaMetadata.set(data.getKey(), data.getValue().toString());
+						}
+					}
+					return luaMetadata;
+				});
+			}
+		}
+		
 		private class GetTotalTrackTime extends ZeroArgFunction
 		{
 			@Override
@@ -339,48 +369,30 @@ public class LuaAudioPlayer
 			}
 		}
 		
-		private class GetSource extends ZeroArgFunction
+		private class SetMetadata extends VarArgFunction
 		{
 			@Override
-			public LuaValue call()
+			public LuaValue invoke(Varargs args)
 			{
 				return LuaHelper.handleExceptions(this.getClass(), () -> {
-					IAudioProvider provider = mTrack.getProvider();
-					if(provider instanceof TrackedFileProvider)
+					if(args.narg() == 1 && args.istable(1)) // If it's a table
 					{
-						return LuaValue.valueOf(((TrackedFileProvider) provider).getSource());
+						LuaValue k = LuaValue.NIL;
+						while (true) 
+						{
+						    Varargs n = args.checktable(1).next(k);
+						    if ( (k = n.arg1()).isnil() )
+						       break;
+						    LuaValue v = n.arg(2);
+						    
+						    mTrack.getMetadata().put(k.tojstring(1), v.tojstring(2));
+						}
 					}
-					else if(provider instanceof TrackedURLProvider)
+					else if(args.narg() == 2) // If you want to set just one metadata
 					{
-						return LuaValue.valueOf(((TrackedURLProvider) provider).getSource());
+						mTrack.getMetadata().put(args.tojstring(1), args.tojstring(2));
 					}
-					else
-					{
-						return LuaValue.NIL;
-					}
-				});
-			}
-		}
-		
-		private class SetTitle extends OneArgFunction
-		{
-			@Override
-			public LuaValue call(LuaValue title)
-			{
-				return LuaHelper.handleExceptions(this.getClass(), () -> {
-					mTrack.setTitle(title.tojstring());
 					return LuaValue.NIL;
-				});
-			}
-		}
-		
-		private class GetTitle extends ZeroArgFunction
-		{
-			@Override
-			public LuaValue call()
-			{
-				return LuaHelper.handleExceptions(this.getClass(), () -> {
-					return LuaValue.valueOf(mTrack.getTitle());
 				});
 			}
 		}
