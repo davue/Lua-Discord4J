@@ -271,9 +271,9 @@ public class TrackedAudioPlayer implements IAudioProvider {
 			} else {
 				track.close();
 			}
-			
-			Main.mDiscordClient.getDispatcher().dispatch(new AudioUpdateEvent());
 		}
+		
+		Main.mDiscordClient.getDispatcher().dispatch(new AudioUpdateEvent());
 	}
 
 	/**
