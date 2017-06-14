@@ -1,3 +1,5 @@
+**This Project will no longer be updated, since it turned out to be too time consuming to keep up-to-date**
+
 # Lua-Discord4J
 Lua wrapper for the [Discord4J](https://github.com/austinv11/Discord4J) Discord Java API
 
